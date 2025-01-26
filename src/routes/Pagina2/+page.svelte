@@ -27,38 +27,40 @@
 <div class="bicappFilesManagement">
 	<header>
 		<div class="sideContainer">
-			<img src="img/logoenaming.svg" class="logo" />
+			<a href="/">
+				<img alt="" src="img/logoenaming.svg" class="logo" />
+			</a>
 
 			<div class="d-flex align-items-center">
 				<span class="fs_14 fw_400">Salvato!</span>
-				<img src="img/cloud.svg" class="ml-10" />
+				<img alt="" src="img/cloud.svg" class="ml-10" />
 			</div>
 
 			<div class="d-flex align-items-center">
-				<img src="img/clock.svg" />
-				<img src="img/Vector.png" class="pointer ml-10" />
+				<img alt="" src="img/clock.svg" />
+				<img alt="" src="img/Vector.png" class="pointer ml-10" />
 			</div>
 
 			<div class="d-flex align-items-center">
-				<img src="img/back_arrow.svg" />
-				<img src="img/forward_arrow.svg" />
-				<img src="img/Vector.png" class="pointer ml-10" />
+				<img alt="" src="img/back_arrow.svg" />
+				<img alt="" src="img/forward_arrow.svg" />
+				<img alt="" src="img/Vector.png" class="pointer ml-10" />
 			</div>
 		</div>
 
 		<div class="d-flex align-items-center pointer">
 			<span class="fs_20 fw_600">Nome progetto</span>
-			<img src="img/Vector.png" class="ml-10" />
+			<img alt="" src="img/Vector.png" class="ml-10" />
 		</div>
 
 		<div class="sideContainer">
-			<img src="img/profile_picture.svg" class="pointer" />
-			<img src="img/play.svg" class="pointer" />
-			<img src="img/download.svg" class="pointer" />
+			<img alt="" src="img/profile_picture.svg" class="pointer" />
+			<img alt="" src="img/play.svg" class="pointer" />
+			<img alt="" src="img/download.svg" class="pointer" />
 
 			<button class="btn btn-secondary btn-small">
 				<span>Esci</span>
-				<img src="img/Vector.png" class="pointer ml-10" />
+				<img alt="" src="img/Vector.png" class="pointer ml-10" />
 			</button>
 		</div>
 	</header>
@@ -66,27 +68,27 @@
 	<div class="pageContainer">
 		<div class="sideBar">
 			<div class="tab top">
-				<img src="img/stile.svg" />
+				<img alt="" src="img/stile.svg" />
 				<span>Stile</span>
 			</div>
 			<div class="tab">
-				<img src="img/pagine.svg" />
+				<img alt="" src="img/pagine.svg" />
 				<span>Pagine</span>
 			</div>
 			<div class="tab active">
-				<img src="img/componi.svg" />
+				<img alt="" src="img/componi.svg" />
 				<span>Componi</span>
 			</div>
 			<div class="tab">
-				<img src="img/caricamenti.svg" />
+				<img alt="" src="img/caricamenti.svg" />
 				<span>Caricamenti</span>
 			</div>
 			<div class="tab">
-				<img src="img/libreria.svg" />
+				<img alt="" src="img/libreria.svg" />
 				<span>Libreria</span>
 			</div>
 			<div class="tab">
-				<img src="img/impostazioni.svg" />
+				<img alt="" src="img/impostazioni.svg" />
 				<span>Impostazioni</span>
 			</div>
 			<div class="tab"></div>
@@ -96,7 +98,7 @@
 			<div class="leftShoulder">
 				<div class="d-flex">
 					<h1>Feedback e Notifiche</h1>
-					<img src="img/info.svg" class="infoPoint" />
+					<img alt="" src="img/info.svg" class="infoPoint" />
 				</div>
 
 				<div class="sectionPage2">
@@ -104,7 +106,7 @@
 					<div class="accordion-item">
 						<div class="accordion-header" on:click={() => toggleAccordion('tipologia_feedback')}>
 							Tipologia di Feedback
-							<img src="img/freccia_basso.svg" class="accordion-arrow" />
+							<img alt="" src="img/freccia_basso.svg" class="accordion-arrow" />
 						</div>
 						{#if accordionStates.tipologia_feedback}
 							<div id="tipologia_feedback" class="accordion_tipologia_feedback">
@@ -121,7 +123,7 @@
             <div class="accordion-item">
               <div class="accordion-header" on:click={() => toggleAccordion('personalizzazione_feedback')}>
                 Personalizzazione del Feedback
-                <img src="img/freccia_basso.svg" class="accordion-arrow">
+                <img alt="" src="img/freccia_basso.svg" class="accordion-arrow">
               </div>
                {#if accordionStates.personalizzazione_feedback}
               <div id="personalizzazione_feedback" class="accordion-content">
@@ -203,7 +205,7 @@
 					<div class="accordion-item">
 						<div class="accordion-header" on:click={() => toggleAccordion('notifiche')}>
 							Notifiche
-							<img src="img/freccia_basso.svg" class="accordion-arrow" />
+							<img alt="" src="img/freccia_basso.svg" class="accordion-arrow" />
 						</div>
 						{#if accordionStates.notifiche}
 							<div id="notifiche" class="accordion-content">
@@ -276,7 +278,7 @@
 					<!-- <div class="accordion-item">
               <div class="accordion-header" on:click={() => toggleAccordion('personalizzazione_notifiche')}>
                 Personalizzazione delle Notifiche
-                <img src="img/freccia_basso.svg" class="accordion-arrow">
+                <img alt="" src="img/freccia_basso.svg" class="accordion-arrow">
               </div>
               {#if accordionStates.personalizzazione_notifiche}
               <div id="personalizzazione_notifiche" class="accordion-content">
@@ -392,7 +394,7 @@
 							class="accordion-header"
 							on:click={() => toggleAccordion('i_miei_feedback_notifiche')}>
 							I miei feedback e notifiche
-							<img src="img/freccia_basso.svg" class="accordion-arrow" />
+							<img alt="" src="img/freccia_basso.svg" class="accordion-arrow" />
 						</div>
 						{#if accordionStates.i_miei_feedback_notifiche}
 							<div id="i_miei_feedback_notifiche" class="accordion-content">
@@ -423,15 +425,15 @@
 			<div class="mobilePreview"></div>
 			<div class="pageNumberContainer">
 				<span class="fw_400">1/5</span>
-				<img src="img/Vector.png" class="ml-10" />
+				<img alt="" src="img/Vector.png" class="ml-10" />
 			</div>
 			<div class="footer">
 				<div class="d-flex align-items-center">
 					<div class="zoom">
 						<input id="zoom_input" type="range" min="0" max="100" step="1" />
 					</div>
-					<img src="img/griglia.svg" class="mx-55 pointer" />
-					<img src="img/help.svg" class="pointer" />
+					<img alt="" src="img/griglia.svg" class="mx-55 pointer" />
+					<img alt="" src="img/help.svg" class="pointer" />
 				</div>
 				<div></div>
 			</div>

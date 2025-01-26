@@ -12,7 +12,9 @@
 	<body class="bicappFilesManagement">
 		<header>
 			<div class="sideContainer">
-				<img src="img/logoenaming.svg" class="logo" />
+				<a href="/">
+					<img alt="" src="img/logoenaming.svg" class="logo" />
+				</a>
 
 				<div class="d-flex align-items-center">
 					<span class="fs_14 fw_400">Salvato!</span>
