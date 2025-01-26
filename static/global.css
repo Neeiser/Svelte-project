@@ -374,14 +374,13 @@ cursor: pointer;
 }
 
 .other-btn {
-    width: 120px !important;
-    height: 15px !important;
+    width: 120px;
+    height: 30px;
     justify-content: center;
-    display: flex !important;
-    align-items: center !important;
-    color: rgba(255, 253, 254, 1);
+    display: flex;
+    align-items: center;
+    color: rgb(0, 0, 0);
     border:0.5px solid #9F1349;
-    margin-left: 105px !important;
 }
 
 .sound-btn {
@@ -1070,26 +1069,23 @@ header {
                 background-color: #FFFDFE;
                 display: flex;
                 flex-direction: column;
-                align-items: center;
             }
 
             
             
-            .accordion-content button {
+            button {
                 background-color: #FFFDFE;
                 color: black;
                 border: 1px solid #949494;
-                width: 75%;
-                height: 45px;
-                padding: 10px;
-                margin: 10px;
+                
                 border-radius: 7px;
                 cursor: pointer;
                 text-align: center;
-                
             }
 
-            .accordion-content button:hover {
+           
+
+            button:hover {
                 background-color: rgba(130, 19, 73, 0.1);
                 border: 1px solid #9F1349;
             }
@@ -1549,7 +1545,7 @@ h4 {
       
 .box-notification-sms {
     width: 370px;
-    height: 60px;
+    height: 80px;
     background-color: #FFFDFE;
     margin: 10px 0;
     display: flex;
@@ -1661,22 +1657,6 @@ h4 {
     margin-top: auto;
 }
 
-.Open-btn .Close-btn {
-    width: 50px !important;
-    height: 30px !important;
-    background-color: #9F1349;
-    color: #FFFDFE;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    align-items: end;
- 
-}
-
-.Open-btn  .Close-btn {
-    border-radius: 8px;
-    
-}
 
 
 
@@ -1740,7 +1720,6 @@ h4 {
     border-radius: 6px;
     border: #393e39 solid 1px;
     justify-content: flex-start;
-    margin-top: 50px;
 }
 
 
