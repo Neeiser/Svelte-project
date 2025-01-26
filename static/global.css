@@ -434,6 +434,8 @@ cursor: pointer;
     max-height: 100%; /* Altezza massima dell'immagine */
 }
 
+
+
 /*Totale*/
 
 .back {
@@ -1065,7 +1067,7 @@ header {
             .accordion-content  {
                 display: none;
                 padding: 10px;
-                background-color: #fff;
+                background-color: #FFFDFE;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -1103,6 +1105,21 @@ header {
 
             
             
+            @media (max-width: 768px) {
+                .accordion-header {
+                    font-size: 16px;
+                    padding: 10px;
+                }
+            
+                .accordion-content {
+                    padding: 10px;
+                }
+            }
+
+
+
+
+
 
             .popup {
                 display: none; /* Nasconde il pop-up per impostazione predefinita */
@@ -1110,24 +1127,59 @@ header {
                 left: 50%;
                 top: 50%;
                 transform: translate(-50%, -50%);
-                width: 300px;
+                width: 330px;
+                height: 220px;
                 padding: 20px;
-                background-color: white;
+                background-color: #949494;
                 box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
                 z-index: 1000;
             }
             
             .popup-content {
                 position: relative;
+                padding-top: 30px;
             }
             
             .close-btn {
                 position: absolute;
-                top: 10px;
+                top: -10px;
                 right: 10px;
                 font-size: 20px;
                 cursor: pointer;
             }
+
+
+            .button-container3 {
+                display: flex;
+                gap: 5px !important;
+                margin: 10px;
+            }
+
+
+            .button_popup_save {
+                width: 135px !important;
+                height: 15px !important;
+                justify-content: center;
+                display: flex !important;
+                align-items: center !important;
+                background-color: #9F1349;
+                color: #FFFDFE;
+                margin-right: 5px;
+                border: none;
+            }
+
+            .button_popup_icona {
+                width: 135px !important;
+                height: 15px !important;
+                justify-content: center;
+                display: flex !important;
+                align-items: center !important;
+                border: 0.5px solid #949494;
+                color: #FFFDFE;
+                margin-left: 5px;
+            }
+                
+            
             
             .popup-overlay {
                 display: none; /* Nasconde l'overlay per impostazione predefinita */
@@ -1139,6 +1191,39 @@ header {
                 background-color: rgba(0, 0, 0, 0.5);
                 z-index: 999;
             }
+
+
+            .quadrati-popup {
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 20px;
+                background-color: #fffdfe !important;
+                width: 80px;
+                height: 80px;
+                border-radius: 5px;
+                border: #949494 !important;
+                
+            }
+
+            .popup-flex-container {
+                display: flex;
+                gap: 10px;
+                justify-content: center;
+                margin-top: 20px;
+            }
+
+            .x-icon  {
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                width: 12px;
+                height: 12px;
+                cursor: pointer;
+            }
+
+
             
             .button-link {
                 display: inline-block;
@@ -1152,7 +1237,7 @@ header {
                 padding: 10px 20px;
                 font-size: 14px;
                 background-color: #FFFDFE;
-                color: white;
+                color: #fffdfe;
                 border: none;
                 border-radius: 5px;
                 cursor: pointer;
@@ -1207,7 +1292,7 @@ header {
     width: 100px; /* Larghezza dei box */
     height: 40px; /* Altezza dei box */
     padding: 5px 10px;
-    background-color: #F2F2F2;
+    background-color: #FFFDFE;
     font-size: 14px;
     border: 1px solid #949494;
     border-radius: 5px;
@@ -1242,7 +1327,7 @@ header {
     padding: 5px 10px;
     font-size: 14px;
     text-align: left;
-    border: 1px solid #ccc;
+    border: 1px solid #949494;
     border-radius: 5px;
     margin: 0 10px;
     padding-right: 30px;
@@ -1360,7 +1445,7 @@ header {
     height: 40px;
     padding: 5px 10px;
     font-size: 14px;
-    border: 1px solid #ccc;
+    border: 1px solid #949494;
     border-radius: 5px;
 }
 
@@ -1377,14 +1462,37 @@ header {
     margin-left: 5px;
 }
 
-  
+ /* personalizzazione notifiche */
+
+.icon-customization {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 200px;
+}
+
+.icon-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.icon-box {
+    align-items: center;
+    gap: 10px;
+    width: 60%;
+}
+
+
 
 /*notifiche */
 
 .box-notification-push {
     width: 370px;
     height: 60px;
-    background-color: #ffff;
+    background-color: #FFFDFE;
     display: flex;
     align-items: center;
     border-radius: 6px;
@@ -1400,7 +1508,7 @@ header {
 .box-notification-email {
     width: 370px;
     height: 80px;
-    background-color: #ffff;
+    background-color: #FFFDFE;
     margin: 10px 0;
     display: flex;
     border-radius: 6px;
@@ -1411,12 +1519,38 @@ header {
     align-items: center;
 
 
+
 }
+
+
+h4 {
+    font-size: 12px;
+    color: #333;
+    margin-left: 15px;
+    font-weight: 600;
+    font-family: Releway;
+    line-height: 10%;
+}
+
+.paragraph-email {
+    font-size: 11px;
+    color: #333;
+    text-align: left;
+    font-weight: 400;
+    font-family: Releway;
+    clear: left;
+    margin: 0;
+   
+}
+
+
+
+
       
 .box-notification-sms {
     width: 370px;
     height: 60px;
-    background-color: #ffff;
+    background-color: #FFFDFE;
     margin: 10px 0;
     display: flex;
     justify-content: center;
@@ -1438,7 +1572,7 @@ header {
 .box-notification-vocali {
     width: 370px;
     height: 60px;
-    background-color: #ffff;
+    background-color: #FFFDFE;
     margin: 10px 0;
     display: flex;
     justify-content: center;
@@ -1490,7 +1624,7 @@ header {
     width: 25% !important;
     height: 5px;
     border: #373737 solid 1px;
-    background: #ddd;
+    background: #FFFDFE;
     outline: none;
     opacity: 0.7;
     transition: opacity .2s;
@@ -1531,7 +1665,7 @@ header {
     width: 50px !important;
     height: 30px !important;
     background-color: #9F1349;
-    color: white;
+    color: #FFFDFE;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -1542,6 +1676,31 @@ header {
 .Open-btn  .Close-btn {
     border-radius: 8px;
     
+}
+
+
+
+@media (max-width: 768px) {
+    .button-group {
+        flex-direction: column; /* Gli elementi si dispongono verticalmente su schermi piccoli */
+    }
+    .button-container2 {
+        max-width: 100%; /* Ogni elemento occupa tutta la larghezza disponibile */
+    }
+}
+
+@media (max-width: 480px) {
+    button {
+        font-size: 14px; /* Ridimensiona il testo per schermi molto piccoli */
+        padding: 8px 16px;
+    }
+    .volume-icon {
+        width: 16px;
+        height: 16px; /* Riduce la dimensione delle icone */
+    }
+    .slider {
+        width: 100%; /* Lo slider occupa tutta la larghezza */
+    }
 }
 
 
@@ -1609,17 +1768,28 @@ header {
     border:0.5px solid #414041;
     border-radius: 10px !important;
     margin-top: 20px;
-    
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }  
 
-.btn-pers-testuale p{
-    font-size: 12px;
-    color: rgb(44, 41, 42);
-    text-align: center;
-    margin-bottom: 15px;
+.box-popup-testuale {
+    width: 320px;
+    height: 150px;
+    background-color: #FFFDFE;
+    border: #1f1e1e solid 1px !important;
+    justify-content: center;
+    align-items: center;
+    margin-left: 30px;
+    margin-bottom: 30px;
+    border-radius: 7px;
+
+}  
+
     
     
-}
+    
+
 
             
             .content .leftShoulder .section .btn.btn-primary {
