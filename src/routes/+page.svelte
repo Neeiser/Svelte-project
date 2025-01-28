@@ -1,12 +1,19 @@
 <script>
-	// Qui puoi aggiungere la logica JavaScript (se necessario)
+	import { slide } from 'svelte/transition';
+	import FeedbackNotifiche from './Pagina2/+page.svelte'; // Importa il componente figlio
+
+	let showFeedbackNotifiche = false;
+
+	function toggleFeedbackNotifiche() {
+		showFeedbackNotifiche = !showFeedbackNotifiche;
+	}
 </script>
 
 <header>
 	<div class="sideContainer">
-		<a href="/">
+		<button class="noBorder" on:click={toggleFeedbackNotifiche}>
 			<img alt="" src="img/logoenaming.svg" class="logo" />
-		</a>
+		</button>
 
 		<div class="d-flex align-items-center">
 			<span class="fs_14 fw_400">Salvato!</span>
@@ -71,6 +78,11 @@
 		<div class="tab"></div>
 	</div>
 	<div class="content">
+		{#if showFeedbackNotifiche}
+			<div transition:slide={{ duration: 300 }}>
+				<FeedbackNotifiche />
+			</div>
+		{/if}
 		<div class="leftShoulder">
 			<div class="d-flex">
 				<h1>Componi</h1>
@@ -93,7 +105,7 @@
 				</div>
 			</div>
 
-			<div class="section">
+			<div class="section flex-section">
 				<div class="Rettangoli-componenti">
 					<img alt="" src="/img/icone_libreria/icona_16.svg" />
 					<p>Titolo</p>
@@ -135,12 +147,10 @@
 					<p>Questionario Qualtrics</p>
 				</div>
 
-				<a href="/Pagina2">
-					<div class="Rettangoli-componenti pulse">
-						<img alt="" src="/img/icone_feedback__notification.svg" />
-						<p>Feedback e Notifiche</p>
-					</div>
-				</a>
+				<button class="Rettangoli-componenti pulse" on:click={toggleFeedbackNotifiche}>
+					<img alt="" src="/img/icone_feedback__notification.svg" />
+					<p>Feedback e Notifiche</p>
+				</button>
 
 				<div class="Rettangoli-componenti">
 					<img alt="" src="/img/grafico.svg" />
@@ -202,8 +212,22 @@
 </div>
 
 <style scoped>
+	.leftShoulder {
+		z-index: 10;
+	}
+	.flex-section {
+		display: flex !important;
+		flex-wrap: wrap;
+	}
 	a {
 		text-decoration: none;
+	}
+
+	.noBorder {
+		border: none;
+	}
+	.noBorder:hover {
+		background: transparent;
 	}
 
 	a:link,
