@@ -1,6 +1,6 @@
 <script>
-	import { slide } from 'svelte/transition';
-	import FeedbackNotifiche from './Pagina2/+page.svelte'; // Importa il componente figlio
+	import { fly } from 'svelte/transition';
+	import FeedbackNotifiche from './Pagina2/+page.svelte';
 
 	let showFeedbackNotifiche = false;
 
@@ -9,7 +9,7 @@
 	}
 </script>
 
-<header>
+<header style="z-index: 100;">
 	<div class="sideContainer">
 		<button class="noBorder" on:click={toggleFeedbackNotifiche}>
 			<img alt="" src="img/logoenaming.svg" class="logo" />
@@ -79,8 +79,8 @@
 	</div>
 	<div class="content">
 		{#if showFeedbackNotifiche}
-			<div transition:slide={{ duration: 300 }}>
-				<FeedbackNotifiche />
+			<div transition:fly={{ x: -600, duration: 300 }} style="z-index: 50;">
+				<FeedbackNotifiche on:closeFeedback={toggleFeedbackNotifiche} />
 			</div>
 		{/if}
 		<div class="leftShoulder">

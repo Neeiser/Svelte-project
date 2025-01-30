@@ -1,4 +1,8 @@
 <script>
+	import { fly } from 'svelte/transition';
+	import { createEventDispatcher } from 'svelte';
+	import FeedbackVisivo from '../Pagina3/+page.svelte';
+
 	let accordionStates = {
 		tipologia_feedback: false,
 		personalizzazione_feedback: false,
@@ -7,24 +11,33 @@
 		i_miei_feedback_notifiche: false,
 	};
 
-	let timeVisualization = 1;
+	let showFeedbackVisivo = false; // Stato per mostrare FeedbackVisivo
+	const dispatch = createEventDispatcher();
 
 	function toggleAccordion(id) {
 		accordionStates[id] = !accordionStates[id];
 	}
 
-	function increaseTime() {
-		timeVisualization += 1;
+	function openFeedbackVisivo() {
+		showFeedbackVisivo = true;
 	}
 
-	function decreaseTime() {
-		if (timeVisualization > 0) {
-			timeVisualization -= 1;
-		}
+	function closeFeedbackVisivo() {
+		showFeedbackVisivo = false;
 	}
 </script>
 
+{#if showFeedbackVisivo}
+	<div
+		class="feedbackVisivoContainer"
+		transition:fly={{ x: -600, duration: 300 }}
+		style="position: sticky; top: 0; left: 0; z-index: 100;">
+		<FeedbackVisivo on:closeFeedbackVisivo={closeFeedbackVisivo} />
+	</div>
+{/if}
+
 <div class="leftShoulder">
+	<h2 class="backButton" on:click={() => dispatch('closeFeedback')}>Back</h2>
 	<div class="d-flex">
 		<h1>Feedback e Notifiche</h1>
 		<img alt="" src="img/info.svg" class="infoPoint" />
@@ -39,7 +52,7 @@
 			</div>
 			{#if accordionStates.tipologia_feedback}
 				<div id="tipologia_feedback" class="accordion_tipologia_feedback">
-					<button>Visivo</button>
+					<button on:click={openFeedbackVisivo}>Visivo</button>
 					<button>Testuale</button>
 					<button>Sonoro</button>
 					<button>Tattile</button>
@@ -151,9 +164,15 @@
 </div>
 
 <style scoped>
+	.backButton {
+		position: absolute;
+		top: 10px;
+		font-size: 16px;
+		cursor: pointer;
+		text-decoration: underline;
+	}
 	.leftShoulder {
 		position: absolute;
-		z-index: 50;
 		width: 490px;
 		padding: 45px 20px;
 		background: #fffdfe;
