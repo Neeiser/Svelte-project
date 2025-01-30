@@ -47,7 +47,7 @@
 <div class="leftShoulder">
 	<h2 class="backButton" on:click={() => dispatch('closeFeedbackVisivo')}>Back</h2>
 	<div class="d-flex">
-		<h1>Feedback e Notifiche</h1>
+		<h1>Feedback visivo</h1>
 		<img src="img/info.svg" class="infoPoint" />
 	</div>
 	<div class="sectionPage3">
