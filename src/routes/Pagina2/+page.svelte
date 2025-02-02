@@ -2,6 +2,9 @@
 	import { fly } from 'svelte/transition';
 	import { createEventDispatcher } from 'svelte';
 	import FeedbackVisivo from '../Pagina3/+page.svelte';
+	import FeedbackTestuale from '../Pagina4/+page.svelte';
+	import FeedbackSonoro from '../Pagina5/+page.svelte';
+	import FeedbackTattile from '../Pagina6/+page.svelte';
 
 	let accordionStates = {
 		tipologia_feedback: false,
@@ -25,14 +28,67 @@
 	function closeFeedbackVisivo() {
 		showFeedbackVisivo = false;
 	}
+
+	let showFeedbackTestuale = false;
+
+	function openFeedbackTestuale() {
+		showFeedbackTestuale = true;
+	}
+
+	function closeFeedbackTestuale() {
+		showFeedbackTestuale = false;
+	}
+
+	let showFeedbackSonoro = false;
+
+	function openFeedbackSonoro() {
+		showFeedbackSonoro = true;
+	}
+
+	function closeFeedbackSonoro() {
+		showFeedbackSonoro = false;
+	}
+
+	let showFeedbackTattile = false;
+
+	function openFeedbackTattile() {
+		showFeedbackTattile = true;
+	}
+
+	function closeFeedbackTattile() {
+		showFeedbackTattile = false;
+	}
 </script>
 
 {#if showFeedbackVisivo}
 	<div
-		class="feedbackVisivoContainer"
 		transition:fly={{ x: -600, duration: 300 }}
 		style="position: sticky; top: 0; left: 0; z-index: 100;">
 		<FeedbackVisivo on:closeFeedbackVisivo={closeFeedbackVisivo} />
+	</div>
+{/if}
+
+{#if showFeedbackTestuale}
+	<div
+		transition:fly={{ x: -600, duration: 300 }}
+		style="position: sticky; top: 0; left: 0; z-index: 100;">
+		<FeedbackTestuale on:closeFeedbackTestuale={closeFeedbackTestuale} />
+	</div>
+{/if}
+
+{#if showFeedbackSonoro}
+	<div
+		transition:fly={{ x: -600, duration: 300 }}
+		style="position: sticky; top: 0; left: 0; z-index: 100;">
+		<FeedbackSonoro on:closeFeedbackSonoro={closeFeedbackSonoro} />
+	</div>
+{/if}
+
+{#if showFeedbackTattile}
+	<div
+		transition:fly={{ x: -600, duration: 300 }}
+		style="position: sticky; top: 0; left: 0; z-index: 100;">
+		<FeedbackTattile on:closeFeedbackTattile={closeFeedbackTattile} />
 	</div>
 {/if}
 
@@ -53,9 +109,9 @@
 			{#if accordionStates.tipologia_feedback}
 				<div id="tipologia_feedback" class="accordion_tipologia_feedback">
 					<button on:click={openFeedbackVisivo}>Visivo</button>
-					<button>Testuale</button>
-					<button>Sonoro</button>
-					<button>Tattile</button>
+					<button on:click={openFeedbackTestuale}>Testuale</button>
+					<button on:click={openFeedbackSonoro}>Sonoro</button>
+					<button on:click={openFeedbackTattile}>Tattile</button>
 				</div>
 			{/if}
 		</div>
