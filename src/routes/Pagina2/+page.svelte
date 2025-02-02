@@ -58,6 +58,82 @@
 	function closeFeedbackTattile() {
 		showFeedbackTattile = false;
 	}
+
+	let dialogStates = {
+		push: false,
+		email: false,
+		sms: false,
+	};
+
+	let defaultTitlePush = 'Your message!';
+	let defaultDescPush = 'Lorem ipsum dolor sit amet..';
+	let titlePush = defaultTitlePush;
+	let descPush = defaultDescPush;
+
+	let defaultTitleEmail = 'Your message!';
+	let defaultDescEmail = 'Lorem ipsum dolor sit amet..';
+	let titleEmail = defaultTitleEmail;
+	let descEmail = defaultDescEmail;
+
+	let defaultTitleSms = 'Your message!';
+	let defaultDescSms = 'Lorem ipsum dolor sit amet..';
+	let titleSms = defaultTitleSms;
+	let descSms = defaultDescSms;
+
+	let tempTitlePush, tempDescPush;
+	let tempTitleEmail, tempDescEmail;
+	let tempTitleSms, tempDescSms;
+
+	function toggleDialog(id) {
+		dialogStates = { ...dialogStates, [id]: true };
+
+		if (id === 'push') {
+			tempTitlePush = titlePush;
+			tempDescPush = descPush;
+		} else if (id === 'email') {
+			tempTitleEmail = titleEmail;
+			tempDescEmail = descEmail;
+		} else if (id === 'sms') {
+			tempTitleSms = titleSms;
+			tempDescSms = descSms;
+		}
+	}
+
+	function savePush() {
+		titlePush = tempTitlePush;
+		descPush = tempDescPush;
+		dialogStates.push = false;
+	}
+
+	function closePush() {
+		titlePush = defaultTitlePush;
+		descPush = defaultDescPush;
+		dialogStates.push = false;
+	}
+
+	function saveEmail() {
+		titleEmail = tempTitleEmail;
+		descEmail = tempDescEmail;
+		dialogStates.email = false;
+	}
+
+	function closeEmail() {
+		titleEmail = defaultTitleEmail;
+		descEmail = defaultDescEmail;
+		dialogStates.email = false;
+	}
+
+	function saveSms() {
+		titleSms = tempTitleSms;
+		descSms = tempDescSms;
+		dialogStates.sms = false;
+	}
+
+	function closeSms() {
+		titleSms = defaultTitleSms;
+		descSms = defaultDescSms;
+		dialogStates.sms = false;
+	}
 </script>
 
 {#if showFeedbackVisivo}
@@ -93,7 +169,10 @@
 {/if}
 
 <div class="leftShoulder">
-	<h2 class="backButton" on:click={() => dispatch('closeFeedback')}>Back</h2>
+	<h2 class="backButton" on:click={() => dispatch('closeFeedback')}>
+		<img src="img/freccia_sinistra.svg" class="accordion-arrow" />
+		Back
+	</h2>
 	<div class="d-flex">
 		<h1>Feedback e Notifiche</h1>
 		<img alt="" src="img/info.svg" class="infoPoint" />
@@ -127,41 +206,101 @@
 					<p class="notifiche-label">Push</p>
 					<div class="sms">
 						<div class="box-notification-sms">
-							<div class="circle"></div>
-							<div>
-								<h4>Your message!</h4>
-								<p class="paragraph-email">Lorem ipsum dolor sit amet..</p>
+							<div class="circle"><img src="img/pen.png" alt="" /></div>
+							<div class="textBox">
+								<h4>{titlePush}</h4>
+								<p class="paragraph-email">{descPush}</p>
 							</div>
 							<div class="box-notification-sms-buttons">
-								<button class="buttonStyle">Open</button>
-								<button class="buttonStyle">Close</button>
+								<button class="buttonStyle" on:click={() => toggleDialog('push')}
+									>Modifica testo</button>
 							</div>
 						</div>
+						{#if dialogStates.push}
+							<div class="windowPush">
+								<div class="windowPushBox">
+									<label for="pushTitle">Titolo</label>
+									<input type="text" name="pushTitle" id="pushTitle" bind:value={tempTitlePush} />
+								</div>
+								<div class="windowPushBox">
+									<label for="pushDesc">Descrizione</label>
+									<input type="text" name="pushDesc" id="pushDesc" bind:value={tempDescPush} />
+								</div>
+								<div class="windowPushAction">
+									<button class="buttonStyle" on:click={closePush}> Annulla </button>
+									<button class="buttonStyle" on:click={savePush}> Salva </button>
+								</div>
+							</div>
+						{/if}
 					</div>
 
 					<p class="notifiche-label">Email</p>
 					<div class="email">
 						<div class="box-notification-email">
-							<div class="circle"></div>
+							<div class="circle"><img src="img/pen.png" alt="" /></div>
 							<div>
-								<h4>Your message!</h4>
-								<p class="paragraph-email">Lorem ipsum dolor sit amet..</p>
+								<h4>{titleEmail}</h4>
+								<p class="paragraph-email">{descEmail}</p>
+							</div>
+							<div class="box-notification-sms-buttons">
+								<button class="buttonStyle" on:click={() => toggleDialog('email')}
+									>Modifica testo</button>
 							</div>
 						</div>
+						{#if dialogStates.email}
+							<div class="windowPush">
+								<div class="windowPushBox">
+									<label for="emailTitle">Titolo</label>
+									<input
+										type="text"
+										name="emailTitle"
+										id="emailTitle"
+										bind:value={tempTitleEmail} />
+								</div>
+								<div class="windowPushBox">
+									<label for="emailDesc">Descrizione</label>
+									<input type="text" name="emailDesc" id="emailDesc" bind:value={tempDescEmail} />
+								</div>
+								<div class="windowPushAction">
+									<button class="buttonStyle" on:click={closeEmail}> Annulla </button>
+									<button class="buttonStyle" on:click={saveEmail}> Salva </button>
+								</div>
+							</div>
+						{/if}
 					</div>
 
-					<p>SMS</p>
+					<p class="notifiche-label">SMS</p>
 					<div class="sms">
 						<div class="box-notification-sms">
-							<div class="circle"></div>
+							<div class="circle"><img src="img/pen.png" alt="" /></div>
 							<div>
-								<h4>Your message!</h4>
-								<p class="paragraph-email">Lorem ipsum dolor sit amet..</p>
+								<h4>{titleSms}</h4>
+								<p class="paragraph-email">{descSms}</p>
+							</div>
+							<div class="box-notification-sms-buttons">
+								<button class="buttonStyle" on:click={() => toggleDialog('sms')}
+									>Modifica testo</button>
 							</div>
 						</div>
+						{#if dialogStates.sms}
+							<div class="windowPush">
+								<div class="windowPushBox">
+									<label for="smsTitle">Titolo</label>
+									<input type="text" name="smsTitle" id="smsTitle" bind:value={tempTitleSms} />
+								</div>
+								<div class="windowPushBox">
+									<label for="smsDesc">Descrizione</label>
+									<input type="text" name="smsDesc" id="smsDesc" bind:value={tempDescSms} />
+								</div>
+								<div class="windowPushAction">
+									<button class="buttonStyle" on:click={closeSms}> Annulla </button>
+									<button class="buttonStyle" on:click={saveSms}> Salva </button>
+								</div>
+							</div>
+						{/if}
 					</div>
 
-					<p>Vocali</p>
+					<p class="notifiche-label">Vocali</p>
 					<div class="vocali">
 						<div class="box-notification-vocali">
 							<img src="img/Icon_vocale.svg" alt="Icon_vocale" />
@@ -225,7 +364,6 @@
 		top: 10px;
 		font-size: 16px;
 		cursor: pointer;
-		text-decoration: underline;
 	}
 	.leftShoulder {
 		position: absolute;
@@ -254,6 +392,7 @@
 
 	.box-notification-sms-buttons {
 		display: flex;
+		width: fit-content;
 		flex-direction: column;
 		gap: 8px;
 		margin-left: auto;
@@ -261,6 +400,67 @@
 	}
 
 	.notifiche-label {
-		background-color: red;
+		font-size: 12px;
+		color: #666666;
+		font-weight: 600;
+		margin-left: 10px;
+	}
+
+	.buttonStyle {
+		padding: 4px 8px;
+	}
+
+	.windowPush {
+		display: flex;
+		flex-direction: column;
+		padding: 14px;
+		width: 370px;
+		gap: 6px;
+		border-radius: 6px;
+		border: 1px solid #616161;
+		margin-bottom: 24px;
+	}
+	.windowPush input {
+		padding: 4px;
+		width: 100%;
+	}
+	.windowPush label {
+		min-width: 95px;
+		font-size: 12px;
+		color: #666666;
+		font-weight: 600;
+	}
+
+	.windowPushBox {
+		display: flex;
+		align-items: center;
+	}
+
+	.windowPushAction {
+		display: flex;
+		gap: 12px;
+		margin-top: 6px;
+		margin-left: auto;
+	}
+
+	.textBox {
+		display: flex;
+		flex-direction: column;
+		margin-left: 6px;
+		height: 100%;
+		justify-content: center;
+		width: 200px;
+	}
+	.textBox h4 {
+		display: flex;
+		align-items: center;
+		height: 40%;
+	}
+
+	.textBox p {
+		height: 55%;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		padding-bottom: 8px;
 	}
 </style>

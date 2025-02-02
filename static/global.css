@@ -25,7 +25,7 @@
 }
 
 * {
-    font-family: Raleway;
+    font-family: Raleway !important;
     font-weight: 500;
     margin: 0;
     box-sizing: border-box;
@@ -1507,7 +1507,7 @@ header {
     width: 370px;
     height: 80px;
     background-color: #FFFDFE;
-    margin: 10px 0;
+    margin: 4px 0 16px 0;
     display: flex;
     border-radius: 6px;
     border : 1px solid #616161;
@@ -1524,10 +1524,8 @@ header {
 h4 {
     font-size: 12px;
     color: #333;
-    margin-left: 15px;
     font-weight: 600;
     font-family: Releway;
-    line-height: 10%;
 }
 
 .paragraph-email {
@@ -1549,7 +1547,7 @@ h4 {
     width: 370px;
     height: 80px;
     background-color: #FFFDFE;
-    margin: 10px 0;
+    margin: 4px 0 16px 0;
     display: flex;
     justify-content: center;
     border-radius: 6px;
@@ -1561,17 +1559,35 @@ h4 {
 } 
 
 .circle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 30px;
     height: 30px;
-    background-color: #828483;
+    border: 1px solid black;
     border-radius: 50%;
+    
 }
 
+.circle img{
+    width: 20px;
+    height: 20px;
+}
+
+.circle img:hover{
+    scale: 1.15;
+    transition: 0.1s;
+}
+
+.circle img:active{
+    scale: 0.95;
+    transition: 0.1s;
+}
 .box-notification-vocali {
     width: 370px;
     height: 60px;
     background-color: #FFFDFE;
-    margin: 10px 0;
+    margin: 4px 0 16px 0;
     display: flex;
     justify-content: center;
     border-radius: 6px;
