@@ -238,7 +238,7 @@
 					<div class="email">
 						<div class="box-notification-email">
 							<div class="circle"><img src="img/pen.png" alt="" /></div>
-							<div>
+							<div class="textBox">
 								<h4>{titleEmail}</h4>
 								<p class="paragraph-email">{descEmail}</p>
 							</div>
@@ -273,7 +273,7 @@
 					<div class="sms">
 						<div class="box-notification-sms">
 							<div class="circle"><img src="img/pen.png" alt="" /></div>
-							<div>
+							<div class="textBox">
 								<h4>{titleSms}</h4>
 								<p class="paragraph-email">{descSms}</p>
 							</div>
