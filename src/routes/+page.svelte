@@ -1,12 +1,20 @@
 <script>
 	import { fly } from 'svelte/transition';
 	import FeedbackNotifiche from './Pagina2/+page.svelte';
+	import { lastItem } from '../stores/store.js'; // Importa il store
 
 	let showFeedbackNotifiche = false;
 
 	function toggleFeedbackNotifiche() {
 		showFeedbackNotifiche = !showFeedbackNotifiche;
 	}
+
+	let currentItem = null; // Ultimo elemento inserito
+
+	// Sottoscrizione al store per aggiornare lo stato locale
+	lastItem.subscribe((item) => {
+		currentItem = item;
+	});
 </script>
 
 <header style="z-index: 100;">
@@ -192,7 +200,22 @@
 		</div>
 
 		<div class="centeredContent">
-			<div class="mobilePreview"></div>
+			<div class="mobilePreview">
+				{#if currentItem && currentItem.type === 'icon'}
+					<div
+						class={currentItem.animationType || ''}
+						style="animation-duration: {currentItem.animationSpeed || 2}s;">
+						{@html currentItem.svgContent.replace(
+							'<svg',
+							`
+							<svg
+								fill="${currentItem.fill}"
+								stroke="${currentItem.stroke}"
+						`
+						)}
+					</div>
+				{/if}
+			</div>
 
 			<div class="pageNumberContainer">
 				<span class="fw_400">1/5</span>
@@ -256,5 +279,47 @@
 			transform: scale(0.95);
 			box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
 		}
+	}
+
+	@keyframes rotateClockwise {
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	@keyframes rotateAntiClockwise {
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(-360deg);
+		}
+	}
+
+	@keyframes ping {
+		0% {
+			transform: scale(1);
+		}
+		50% {
+			transform: scale(1.2);
+		}
+		100% {
+			transform: scale(1);
+		}
+	}
+
+	.rotateClockwise {
+		animation: rotateClockwise linear infinite;
+	}
+
+	.rotateAntiClockwise {
+		animation: rotateAntiClockwise linear infinite;
+	}
+
+	.ping {
+		animation: ping ease-in-out infinite;
 	}
 </style>

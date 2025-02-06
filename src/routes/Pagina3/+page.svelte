@@ -1,6 +1,8 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
+	import { addItem } from '../../stores/store';
 	const dispatch = createEventDispatcher();
+
 	let accordionStates = {
 		feedback_visivo: false,
 		indicatori_attesa: false,
@@ -26,9 +28,14 @@
 	}
 
 	function toggleButtonContent(id) {
-		console.log('bottone cliccato');
-		console.log(buttonStates);
-		buttonStates[id] = !buttonStates[id];
+		if (buttonStates[id]) {
+			buttonStates[id] = false;
+		} else {
+			Object.keys(buttonStates).forEach((key) => {
+				buttonStates[key] = false;
+			});
+			buttonStates[id] = true;
+		}
 	}
 
 	function updateMobilePreview(imageSrc) {
@@ -41,6 +48,104 @@
 
 	function hidePopup() {
 		showPopup = false;
+	}
+
+	let selectedIcon = '';
+	let showColorPicker = false;
+	let selectedSvgContent = '';
+	let selectedStroke = '#000000';
+	let selectedFill = '#000000';
+
+	// Nuove variabili per animazione
+	let animationType = ''; // può essere rotateClockwise, rotateAntiClockwise, ping, o ''
+	let animationSpeed = 2; // in secondi
+
+	function handleIconClick(iconSrc) {
+		selectedIcon = iconSrc;
+		showColorPicker = true;
+
+		fetch(iconSrc)
+			.then((response) => response.text())
+			.then((data) => {
+				const parser = new DOMParser();
+				const svgDoc = parser.parseFromString(data, 'image/svg+xml');
+				const svgElement = svgDoc.querySelector('svg');
+
+				if (svgElement) {
+					// Rimuove fill e stroke da eventuali path interni
+					svgElement.querySelectorAll('*').forEach((el) => {
+						el.removeAttribute('fill');
+						el.removeAttribute('stroke');
+					});
+
+					selectedSvgContent = new XMLSerializer().serializeToString(svgElement);
+				}
+				// Aggiorniamo subito lo store, con valori di default
+				addItem({
+					type: 'icon',
+					src: selectedIcon,
+					svgContent: selectedSvgContent,
+					fill: selectedFill,
+					stroke: selectedStroke,
+					animationType,
+					animationSpeed,
+				});
+			})
+			.catch((error) => console.error('Errore nel recupero dei dati SVG:', error));
+	}
+
+	function handleFillChange(event) {
+		selectedFill = event.target.value;
+		addItem({
+			type: 'icon',
+			src: selectedIcon,
+			svgContent: selectedSvgContent,
+			fill: selectedFill,
+			stroke: selectedStroke,
+			animationType,
+			animationSpeed,
+		});
+	}
+
+	function handleStrokeChange(event) {
+		selectedStroke = event.target.value;
+		addItem({
+			type: 'icon',
+			src: selectedIcon,
+			svgContent: selectedSvgContent,
+			fill: selectedFill,
+			stroke: selectedStroke,
+			animationType,
+			animationSpeed,
+		});
+	}
+
+	// Quando l'utente sceglie il tipo di animazione
+	function handleAnimationTypeChange(event) {
+		animationType = event.target.value;
+		addItem({
+			type: 'icon',
+			src: selectedIcon,
+			svgContent: selectedSvgContent,
+			fill: selectedFill,
+			stroke: selectedStroke,
+			animationType,
+			animationSpeed,
+		});
+	}
+
+	// Quando l'utente sceglie la velocità
+	function handleAnimationSpeedChange(event) {
+		animationSpeed = +event.target.value; // convertiamo in numero
+		addItem({
+			type: 'icon',
+			src: selectedIcon,
+			svgContent: selectedSvgContent,
+			fill: selectedFill,
+			stroke: selectedStroke,
+			animationType,
+			animationSpeed,
+		});
 	}
 </script>
 
@@ -63,17 +168,85 @@
 				{#if buttonStates.indicatori_attesa}
 					<div class="indicatori_attesa_style">
 						<div class="indicatori_attesa_style_child">
-							<button on:click={() => updateMobilePreview('img/Clessidra_icon.svg')}>
+							<button on:click={() => handleIconClick('img/Clessidra_icon.svg')}>
 								<img src="img/Clessidra_icon.svg" alt="icon" />
 							</button>
-							<button on:click={() => updateMobilePreview('img/cerchio_freccia_caricamento.svg')}>
+							<button on:click={() => handleIconClick('img/cerchio_freccia_caricamento.svg')}>
 								<img src="img/cerchio_freccia_caricamento.svg" alt="icon" />
 							</button>
-							<button on:click={() => updateMobilePreview('img/cerchio_caricamento_linee.svg')}>
+							<button on:click={() => handleIconClick('img/cerchio_caricamento_linee.svg')}>
 								<img src="img/cerchio_caricamento_linee.svg" alt="icon" />
 							</button>
 						</div>
-						<!-- <button class="other-btn" on:click={displayPopup}>Altre opzioni</button> -->
+						{#if showColorPicker}
+							<div class="color-picker">
+								<label for="fillColor">Seleziona riempimento:</label>
+								<input
+									type="color"
+									id="fillColor"
+									bind:value={selectedFill}
+									on:input={handleFillChange} />
+							</div>
+							<div class="color-picker">
+								<label for="strokeColor">Seleziona traccia:</label>
+								<input
+									type="color"
+									id="strokeColor"
+									bind:value={selectedStroke}
+									on:input={handleStrokeChange} />
+							</div>
+							<div class="animationOptions">
+								<h3>Animazione icona</h3>
+								<div>
+									<label>
+										<input
+											type="radio"
+											name="animation"
+											value=""
+											on:change={handleAnimationTypeChange}
+											checked={animationType === ''} />
+										Nessuna
+									</label>
+									<label>
+										<input
+											type="radio"
+											name="animation"
+											value="rotateClockwise"
+											on:change={handleAnimationTypeChange}
+											checked={animationType === 'rotateClockwise'} />
+										Rotazione Oraria
+									</label>
+									<label>
+										<input
+											type="radio"
+											name="animation"
+											value="rotateAntiClockwise"
+											on:change={handleAnimationTypeChange}
+											checked={animationType === 'rotateAntiClockwise'} />
+										Rotazione Antioraria
+									</label>
+									<label>
+										<input
+											type="radio"
+											name="animation"
+											value="ping"
+											on:change={handleAnimationTypeChange}
+											checked={animationType === 'ping'} />
+										Ping
+									</label>
+								</div>
+								<div>
+									<label for="animationSpeed">Velocità (secondi):</label>
+									<input
+										type="number"
+										id="animationSpeed"
+										min="0.1"
+										step="0.1"
+										bind:value={animationSpeed}
+										on:change={handleAnimationSpeedChange} />
+								</div>
+							</div>
+						{/if}
 					</div>
 				{/if}
 
@@ -87,45 +260,85 @@
 				{#if buttonStates.messaggi_conferma}
 					<div id="messaggi_conferma" class="button-content indicatori_attesa_style">
 						<div class="indicatori_attesa_style_child">
-							<button on:click={() => updateMobilePreview('img/confermaV.svg')}>
+							<button on:click={() => handleIconClick('img/confermaV.svg')}>
 								<img src="img/confermaV.svg" alt="icon" />
 							</button>
-							<button on:click={() => updateMobilePreview('img/smile2.svg')}>
+							<button on:click={() => handleIconClick('img/smile2.svg')}>
 								<img src="img/smile2.svg" alt="icon" />
 							</button>
-							<button on:click={() => updateMobilePreview('img/ok.svg')}>
+							<button on:click={() => handleIconClick('img/ok.svg')}>
 								<img src="img/ok.svg" alt="icon" />
 							</button>
 						</div>
-						<button class="other-btn" on:click={displayPopup}>Altre opzioni</button>
-					</div>
-				{/if}
-				{#if showPopup}
-					<div id="popup" class="popup">
-						<div class="popup-content">
-							<span class="close-btn" on:click={hidePopup}>&times;</span>
-							<div class="popup-flex-container">
-								<div class="quadrati-popup">
-									<img src="img/Clessidra_icon.svg" alt="clessidra" class="clessidra-icon" />
-									<img src="img/iconX.svg" alt="x" class="x-icon" />
+						{#if showColorPicker}
+							<div class="color-picker">
+								<label for="fillColor">Seleziona riempimento:</label>
+								<input
+									type="color"
+									id="fillColor"
+									bind:value={selectedFill}
+									on:input={handleFillChange} />
+							</div>
+							<div class="color-picker">
+								<label for="strokeColor">Seleziona traccia:</label>
+								<input
+									type="color"
+									id="strokeColor"
+									bind:value={selectedStroke}
+									on:input={handleStrokeChange} />
+							</div>
+							<div class="animationOptions">
+								<h3>Animazione icona</h3>
+								<div>
+									<label>
+										<input
+											type="radio"
+											name="animation"
+											value=""
+											on:change={handleAnimationTypeChange}
+											checked={animationType === ''} />
+										Nessuna
+									</label>
+									<label>
+										<input
+											type="radio"
+											name="animation"
+											value="rotateClockwise"
+											on:change={handleAnimationTypeChange}
+											checked={animationType === 'rotateClockwise'} />
+										Rotazione Oraria
+									</label>
+									<label>
+										<input
+											type="radio"
+											name="animation"
+											value="rotateAntiClockwise"
+											on:change={handleAnimationTypeChange}
+											checked={animationType === 'rotateAntiClockwise'} />
+										Rotazione Antioraria
+									</label>
+									<label>
+										<input
+											type="radio"
+											name="animation"
+											value="ping"
+											on:change={handleAnimationTypeChange}
+											checked={animationType === 'ping'} />
+										Ping
+									</label>
 								</div>
-								<div class="quadrati-popup">
-									<img
-										src="img/cerchio_freccia_caricamento.svg"
-										alt="cerchio"
-										class="cerchio-icon" />
-									<img src="img/iconX.svg" alt="x" class="x-icon" />
-								</div>
-								<div class="quadrati-popup">
-									<img src="img/cerchio_caricamento_linee.svg" alt="linee" class="linee-icon" />
-									<img src="img/iconX.svg" alt="x" class="x-icon" />
+								<div>
+									<label for="animationSpeed">Velocità (secondi):</label>
+									<input
+										type="number"
+										id="animationSpeed"
+										min="0.1"
+										step="0.1"
+										bind:value={animationSpeed}
+										on:change={handleAnimationSpeedChange} />
 								</div>
 							</div>
-							<div class="button-container3">
-								<button class="button_popup_icona">Carica Icona</button>
-								<button class="button_popup_save">Salva</button>
-							</div>
-						</div>
+						{/if}
 					</div>
 				{/if}
 				<button
@@ -137,43 +350,85 @@
 				{#if buttonStates.messaggi_errore}
 					<div id="messaggi_errore" class="button-content indicatori_attesa_style">
 						<div class="indicatori_attesa_style_child">
-							<button on:click={() => updateMobilePreview('img/iconX.svg')}>
+							<button on:click={() => handleIconClick('img/iconX.svg')}>
 								<img src="img/iconX.svg" alt="icon" />
 							</button>
-							<button on:click={() => updateMobilePreview('img/smileneg.svg')}>
+							<button on:click={() => handleIconClick('img/smileneg.svg')}>
 								<img src="img/smileneg.svg" alt="icon" />
 							</button>
-							<button on:click={() => updateMobilePreview('img/attention.svg')}>
+							<button on:click={() => handleIconClick('img/attention.svg')}>
 								<img src="img/attention.svg" alt="icon" />
 							</button>
 						</div>
-						<button class="other-btn" on:click={displayPopup}>Altre opzioni</button>
-					</div>
-					<div id="popup" class="popup">
-						<div class="popup-content">
-							<span class="close-btn" on:click={hidePopup}>&times;</span>
-							<div class="popup-flex-container">
-								<div class="quadrati-popup">
-									<img src="img/Clessidra_icon.svg" alt="clessidra" class="clessidra-icon" />
-									<img src="img/iconX.svg" alt="x" class="x-icon" />
+						{#if showColorPicker}
+							<div class="color-picker">
+								<label for="fillColor">Seleziona riempimento:</label>
+								<input
+									type="color"
+									id="fillColor"
+									bind:value={selectedFill}
+									on:input={handleFillChange} />
+							</div>
+							<div class="color-picker">
+								<label for="strokeColor">Seleziona traccia:</label>
+								<input
+									type="color"
+									id="strokeColor"
+									bind:value={selectedStroke}
+									on:input={handleStrokeChange} />
+							</div>
+							<div class="animationOptions">
+								<h3>Animazione icona</h3>
+								<div>
+									<label>
+										<input
+											type="radio"
+											name="animation"
+											value=""
+											on:change={handleAnimationTypeChange}
+											checked={animationType === ''} />
+										Nessuna
+									</label>
+									<label>
+										<input
+											type="radio"
+											name="animation"
+											value="rotateClockwise"
+											on:change={handleAnimationTypeChange}
+											checked={animationType === 'rotateClockwise'} />
+										Rotazione Oraria
+									</label>
+									<label>
+										<input
+											type="radio"
+											name="animation"
+											value="rotateAntiClockwise"
+											on:change={handleAnimationTypeChange}
+											checked={animationType === 'rotateAntiClockwise'} />
+										Rotazione Antioraria
+									</label>
+									<label>
+										<input
+											type="radio"
+											name="animation"
+											value="ping"
+											on:change={handleAnimationTypeChange}
+											checked={animationType === 'ping'} />
+										Ping
+									</label>
 								</div>
-								<div class="quadrati-popup">
-									<img
-										src="img/cerchio_freccia_caricamento.svg"
-										alt="cerchio"
-										class="cerchio-icon" />
-									<img src="img/iconX.svg" alt="x" class="x-icon" />
-								</div>
-								<div class="quadrati-popup">
-									<img src="img/cerchio_caricamento_linee.svg" alt="linee" class="linee-icon" />
-									<img src="img/iconX.svg" alt="x" class="x-icon" />
+								<div>
+									<label for="animationSpeed">Velocità (secondi):</label>
+									<input
+										type="number"
+										id="animationSpeed"
+										min="0.1"
+										step="0.1"
+										bind:value={animationSpeed}
+										on:change={handleAnimationSpeedChange} />
 								</div>
 							</div>
-							<div class="button-container3">
-								<button class="button_popup_icona">Carica Icona</button>
-								<button class="button_popup_save">Salva</button>
-							</div>
-						</div>
+						{/if}
 					</div>
 				{/if}
 
@@ -186,40 +441,82 @@
 				{#if buttonStates.barra_progresso}
 					<div id="barra_progresso" class="button-content indicatori_attesa_style">
 						<div class="indicatori_attesa_style_child progress-buttons">
-							<button on:click={() => updateMobilePreview('img/barra_car1.svg')}>
+							<button on:click={() => handleIconClick('img/barra_car1.svg')}>
 								<img src="img/barra_car1.svg" alt="icon" />
 							</button>
-							<button on:click={() => updateMobilePreview('img/barra_caricamento2.svg')}>
+							<button on:click={() => handleIconClick('img/barra_caricamento2.svg')}>
 								<img src="img/barra_caricamento2.svg" alt="icon" />
 							</button>
 						</div>
-						<button class="other-btn" on:click={displayPopup}>Altre opzioni</button>
-					</div>
-					<div id="popup" class="popup">
-						<div class="popup-content">
-							<span class="close-btn" on:click={hidePopup}>&times;</span>
-							<div class="popup-flex-container">
-								<div class="quadrati-popup">
-									<img src="img/Clessidra_icon.svg" alt="clessidra" class="clessidra-icon" />
-									<img src="img/iconX.svg" alt="x" class="x-icon" />
+						{#if showColorPicker}
+							<div class="color-picker">
+								<label for="fillColor">Seleziona riempimento:</label>
+								<input
+									type="color"
+									id="fillColor"
+									bind:value={selectedFill}
+									on:input={handleFillChange} />
+							</div>
+							<div class="color-picker">
+								<label for="strokeColor">Seleziona traccia:</label>
+								<input
+									type="color"
+									id="strokeColor"
+									bind:value={selectedStroke}
+									on:input={handleStrokeChange} />
+							</div>
+							<div class="animationOptions">
+								<h3>Animazione icona</h3>
+								<div>
+									<label>
+										<input
+											type="radio"
+											name="animation"
+											value=""
+											on:change={handleAnimationTypeChange}
+											checked={animationType === ''} />
+										Nessuna
+									</label>
+									<label>
+										<input
+											type="radio"
+											name="animation"
+											value="rotateClockwise"
+											on:change={handleAnimationTypeChange}
+											checked={animationType === 'rotateClockwise'} />
+										Rotazione Oraria
+									</label>
+									<label>
+										<input
+											type="radio"
+											name="animation"
+											value="rotateAntiClockwise"
+											on:change={handleAnimationTypeChange}
+											checked={animationType === 'rotateAntiClockwise'} />
+										Rotazione Antioraria
+									</label>
+									<label>
+										<input
+											type="radio"
+											name="animation"
+											value="ping"
+											on:change={handleAnimationTypeChange}
+											checked={animationType === 'ping'} />
+										Ping
+									</label>
 								</div>
-								<div class="quadrati-popup">
-									<img
-										src="img/cerchio_freccia_caricamento.svg"
-										alt="cerchio"
-										class="cerchio-icon" />
-									<img src="img/iconX.svg" alt="x" class="x-icon" />
-								</div>
-								<div class="quadrati-popup">
-									<img src="img/cerchio_caricamento_linee.svg" alt="linee" class="linee-icon" />
-									<img src="img/iconX.svg" alt="x" class="x-icon" />
+								<div>
+									<label for="animationSpeed">Velocità (secondi):</label>
+									<input
+										type="number"
+										id="animationSpeed"
+										min="0.1"
+										step="0.1"
+										bind:value={animationSpeed}
+										on:change={handleAnimationSpeedChange} />
 								</div>
 							</div>
-							<div class="button-container3">
-								<button class="button_popup_icona">Carica Icona</button>
-								<button class="button_popup_save">Salva</button>
-							</div>
-						</div>
+						{/if}
 					</div>
 				{/if}
 
@@ -230,43 +527,85 @@
 				{#if buttonStates.aiuto_supporto}
 					<div id="aiuto_supporto" class="button-content indicatori_attesa_style">
 						<div class="indicatori_attesa_style_child">
-							<button on:click={() => updateMobilePreview('img/punto_domanda.svg')}>
+							<button on:click={() => handleIconClick('img/punto_domanda.svg')}>
 								<img src="img/punto_domanda.svg" alt="icon" />
 							</button>
-							<button on:click={() => updateMobilePreview('img/lampadina.svg')}>
+							<button on:click={() => handleIconClick('img/lampadina.svg')}>
 								<img src="img/lampadina.svg" alt="icon" />
 							</button>
-							<button on:click={() => updateMobilePreview('img/chat.svg')}>
+							<button on:click={() => handleIconClick('img/chat.svg')}>
 								<img src="img/chat.svg" alt="icon" />
 							</button>
 						</div>
-						<button class="other-btn" on:click={displayPopup}>Altre opzioni</button>
-					</div>
-					<div id="popup" class="popup">
-						<div class="popup-content">
-							<span class="close-btn" on:click={hidePopup}>&times;</span>
-							<div class="popup-flex-container">
-								<div class="quadrati-popup">
-									<img src="img/Clessidra_icon.svg" alt="clessidra" class="clessidra-icon" />
-									<img src="img/iconX.svg" alt="x" class="x-icon" />
+						{#if showColorPicker}
+							<div class="color-picker">
+								<label for="fillColor">Seleziona riempimento:</label>
+								<input
+									type="color"
+									id="fillColor"
+									bind:value={selectedFill}
+									on:input={handleFillChange} />
+							</div>
+							<div class="color-picker">
+								<label for="strokeColor">Seleziona traccia:</label>
+								<input
+									type="color"
+									id="strokeColor"
+									bind:value={selectedStroke}
+									on:input={handleStrokeChange} />
+							</div>
+							<div class="animationOptions">
+								<h3>Animazione icona</h3>
+								<div>
+									<label>
+										<input
+											type="radio"
+											name="animation"
+											value=""
+											on:change={handleAnimationTypeChange}
+											checked={animationType === ''} />
+										Nessuna
+									</label>
+									<label>
+										<input
+											type="radio"
+											name="animation"
+											value="rotateClockwise"
+											on:change={handleAnimationTypeChange}
+											checked={animationType === 'rotateClockwise'} />
+										Rotazione Oraria
+									</label>
+									<label>
+										<input
+											type="radio"
+											name="animation"
+											value="rotateAntiClockwise"
+											on:change={handleAnimationTypeChange}
+											checked={animationType === 'rotateAntiClockwise'} />
+										Rotazione Antioraria
+									</label>
+									<label>
+										<input
+											type="radio"
+											name="animation"
+											value="ping"
+											on:change={handleAnimationTypeChange}
+											checked={animationType === 'ping'} />
+										Ping
+									</label>
 								</div>
-								<div class="quadrati-popup">
-									<img
-										src="img/cerchio_freccia_caricamento.svg"
-										alt="cerchio"
-										class="cerchio-icon" />
-									<img src="img/iconX.svg" alt="x" class="x-icon" />
-								</div>
-								<div class="quadrati-popup">
-									<img src="img/cerchio_caricamento_linee.svg" alt="linee" class="linee-icon" />
-									<img src="img/iconX.svg" alt="x" class="x-icon" />
+								<div>
+									<label for="animationSpeed">Velocità (secondi):</label>
+									<input
+										type="number"
+										id="animationSpeed"
+										min="0.1"
+										step="0.1"
+										bind:value={animationSpeed}
+										on:change={handleAnimationSpeedChange} />
 								</div>
 							</div>
-							<div class="button-container3">
-								<button class="button_popup_icona">Carica Icona</button>
-								<button class="button_popup_save">Salva</button>
-							</div>
-						</div>
+						{/if}
 					</div>
 				{/if}
 			</div>
@@ -321,5 +660,13 @@
 
 	#feedback_visivo {
 		align-items: center;
+	}
+
+	/* Esempio di box per scelte animazione */
+	.animationOptions {
+		margin-top: 2rem;
+		padding: 1rem;
+		border: 1px solid #ccc;
+		border-radius: 6px;
 	}
 </style>
