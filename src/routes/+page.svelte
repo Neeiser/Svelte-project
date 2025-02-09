@@ -11,12 +11,23 @@
 	}
 
 	let selectedIcon = null;
+
 	$: previewIcon.subscribe((icon) => {
 		selectedIcon = icon;
 	});
 
 	function previewIconHandler(event) {
 		setPreviewIcon(event.detail);
+	}
+
+	let activeNotification = null;
+
+	function previewNotificationHandler(notification) {
+		activeNotification = notification;
+
+		setTimeout(() => {
+			activeNotification = null;
+		}, 5000); // La notifica scompare dopo 5 secondi
 	}
 </script>
 
@@ -92,6 +103,7 @@
 		{#if showFeedbackNotifiche}
 			<div transition:fly={{ x: -600, duration: 300 }} style="z-index: 50;">
 				<FeedbackNotifiche
+					on:showNotification={(event) => previewNotificationHandler(event.detail)}
 					on:closeFeedback={toggleFeedbackNotifiche}
 					on:previewIcon={(event) => previewIconHandler(event)} />
 			</div>
@@ -206,6 +218,19 @@
 
 		<div class="centeredContent">
 			<div class="mobilePreview">
+				{#if activeNotification}
+					<div transition:fly={{ y: -20, duration: 300 }} class="notification-banner">
+						<div class="notificationBox">
+							<div>
+								<img src="img/Account.png" alt="" />
+							</div>
+							<div class="notificationBoxContent">
+								<div class="titleNotificationBoxContent">{activeNotification.title}</div>
+								<div class="descNotificationBoxContent">{activeNotification.description}</div>
+							</div>
+						</div>
+					</div>
+				{/if}
 				{#if selectedIcon}
 					<div
 						class={selectedIcon.animationType || ''}
@@ -324,5 +349,62 @@
 
 	.ping {
 		animation: ping ease-in-out infinite;
+	}
+	.notification-banner {
+		position: absolute;
+		top: 10px;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 90%;
+		max-width: 260px;
+		background: white;
+		color: black;
+		padding: 10px;
+		border-radius: 8px;
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		text-align: left;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		animation: fadeOut 0.3s ease-out 4.7s;
+		z-index: 100;
+	}
+
+	.notificationBox {
+		display: flex;
+		align-items: center;
+	}
+
+	.notificationBox img {
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+	}
+
+	.notificationBoxContent {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		margin-left: 8px;
+	}
+
+	.titleNotificationBoxContent {
+		font-size: 14px;
+		font-weight: 600;
+	}
+
+	.descNotificationBoxContent {
+		font-size: 12px;
+		font-weight: 500;
+		opacity: 0.9;
+	}
+
+	@keyframes fadeOut {
+		0% {
+			opacity: 1;
+		}
+		100% {
+			opacity: 0;
+		}
 	}
 </style>

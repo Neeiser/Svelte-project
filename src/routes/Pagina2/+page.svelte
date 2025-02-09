@@ -7,6 +7,11 @@
 	import FeedbackTattile from '../Pagina6/+page.svelte';
 	import { savedIcons, updateIconTitle, removeIcon } from '../../stores/store'; // Importiamo lo store
 	import { previewIcon, setPreviewIcon } from '../../stores/previewIconStore';
+	import {
+		notifications,
+		addNotification,
+		removeNotification,
+	} from '../../stores/notificationsStore';
 
 	function previewIconHandler(icon) {
 		setPreviewIcon(icon);
@@ -133,22 +138,10 @@
 		}
 	}
 
-	function savePush() {
-		titlePush = tempTitlePush;
-		descPush = tempDescPush;
-		dialogStates.push = false;
-	}
-
 	function closePush() {
 		titlePush = defaultTitlePush;
 		descPush = defaultDescPush;
 		dialogStates.push = false;
-	}
-
-	function saveEmail() {
-		titleEmail = tempTitleEmail;
-		descEmail = tempDescEmail;
-		dialogStates.email = false;
 	}
 
 	function closeEmail() {
@@ -157,16 +150,63 @@
 		dialogStates.email = false;
 	}
 
-	function saveSms() {
-		titleSms = tempTitleSms;
-		descSms = tempDescSms;
-		dialogStates.sms = false;
-	}
-
 	function closeSms() {
 		titleSms = defaultTitleSms;
 		descSms = defaultDescSms;
 		dialogStates.sms = false;
+	}
+
+	function savePush() {
+		const newNotification = {
+			type: 'Push',
+			title: tempTitlePush,
+			description: tempDescPush,
+		};
+		addNotification(newNotification);
+		buttonStates.push = false;
+	}
+
+	function saveEmail() {
+		const newNotification = {
+			type: 'Email',
+			title: tempTitleEmail,
+			description: tempDescEmail,
+		};
+		addNotification(newNotification);
+		buttonStates.email = false;
+	}
+
+	function saveSms() {
+		const newNotification = {
+			type: 'SMS',
+			title: tempTitleSms,
+			description: tempDescSms,
+		};
+		addNotification(newNotification);
+		buttonStates.sms = false;
+	}
+
+	let buttonStates = {
+		push: false,
+		email: false,
+		sms: false,
+		vocali: false,
+	};
+
+	function toggleButtonStates(id) {
+		if (buttonStates[id]) {
+			buttonStates[id] = false;
+		} else {
+			Object.keys(buttonStates).forEach((key) => {
+				buttonStates[key] = false;
+			});
+			buttonStates[id] = true;
+		}
+	}
+
+	function previewNotification(index) {
+		const notification = $notifications[index];
+		dispatch('showNotification', notification);
 	}
 </script>
 
@@ -236,128 +276,95 @@
 				<img alt="" src="img/freccia_basso.svg" class="accordion-arrow" />
 			</div>
 			{#if accordionStates.notifiche}
-				<div id="notifiche" class="accordion-content">
-					<p class="notifiche-label">Push</p>
-					<div class="sms">
-						<div class="box-notification-sms">
-							<div class="circle"><img src="img/pen.png" alt="" /></div>
-							<div class="textBox">
-								<h4>{titlePush}</h4>
-								<p class="paragraph-email">{descPush}</p>
-							</div>
-							<div class="box-notification-sms-buttons">
-								<button class="buttonStyle" on:click={() => toggleDialog('push')}
-									>Modifica testo</button>
-							</div>
-						</div>
-						{#if dialogStates.push}
-							<div class="windowPush">
-								<div class="windowPushBox">
-									<label for="pushTitle">Titolo</label>
-									<input type="text" name="pushTitle" id="pushTitle" bind:value={tempTitlePush} />
-								</div>
-								<div class="windowPushBox">
-									<label for="pushDesc">Descrizione</label>
-									<input type="text" name="pushDesc" id="pushDesc" bind:value={tempDescPush} />
-								</div>
-								<div class="windowPushAction">
-									<button class="buttonStyle" on:click={closePush}> Annulla </button>
-									<button class="buttonStyle" on:click={savePush}> Salva </button>
-								</div>
-							</div>
-						{/if}
+				<div class="customization-container">
+					<!-- Bottoni orizzontali -->
+					<div class="accordion_tipologia_feedback_alt">
+						<button class="buttonStyleWide" on:click={() => toggleButtonStates('push')}
+							>Push</button>
+						<button class="buttonStyleWide" on:click={() => toggleButtonStates('email')}
+							>Email</button>
+						<button class="buttonStyleWide" on:click={() => toggleButtonStates('sms')}>SMS</button>
+						<button class="buttonStyleWide" on:click={() => toggleButtonStates('vocali')}
+							>Vocali</button>
 					</div>
 
-					<p class="notifiche-label">Email</p>
-					<div class="email">
-						<div class="box-notification-email">
-							<div class="circle"><img src="img/pen.png" alt="" /></div>
-							<div class="textBox">
-								<h4>{titleEmail}</h4>
-								<p class="paragraph-email">{descEmail}</p>
+					<!-- Personalizzazione per ciascun componente -->
+					{#if buttonStates.push}
+						<div class="customization-panel">
+							<p>Personalizzazione Push</p>
+							<div class="customizeNotificationStyle">
+								<label for="pushTitle">Titolo</label>
+								<input type="text" name="pushTitle" id="pushTitle" bind:value={tempTitlePush} />
 							</div>
-							<div class="box-notification-sms-buttons">
-								<button class="buttonStyle" on:click={() => toggleDialog('email')}
-									>Modifica testo</button>
+							<div class="customizeNotificationStyle">
+								<label for="pushDesc">Descrizione</label>
+								<input type="text" name="pushDesc" id="pushDesc" bind:value={tempDescPush} />
+							</div>
+							<div class="action-buttons">
+								<button class="buttonStyle" on:click={closePush}>Annulla</button>
+								<button class="buttonStyle" on:click={savePush}>Salva</button>
 							</div>
 						</div>
-						{#if dialogStates.email}
-							<div class="windowPush">
-								<div class="windowPushBox">
-									<label for="emailTitle">Titolo</label>
+					{/if}
+
+					{#if buttonStates.email}
+						<div class="customization-panel">
+							<p>Personalizzazione Email</p>
+							<div class="customizeNotificationStyle">
+								<label for="emailTitle">Titolo</label>
+								<input type="text" name="emailTitle" id="emailTitle" bind:value={tempTitleEmail} />
+							</div>
+							<div class="customizeNotificationStyle">
+								<label for="emailDesc">Descrizione</label>
+								<input type="text" name="emailDesc" id="emailDesc" bind:value={tempDescEmail} />
+							</div>
+							<div class="action-buttons">
+								<button class="buttonStyle" on:click={closeEmail}>Annulla</button>
+								<button class="buttonStyle" on:click={saveEmail}>Salva</button>
+							</div>
+						</div>
+					{/if}
+
+					{#if buttonStates.sms}
+						<div class="customization-panel">
+							<p>Personalizzazione SMS</p>
+							<div class="customizeNotificationStyle">
+								<label for="smsTitle">Titolo</label>
+								<input type="text" name="smsTitle" id="smsTitle" bind:value={tempTitleSms} />
+							</div>
+							<div class="customizeNotificationStyle">
+								<label for="smsDesc">Descrizione</label>
+								<input type="text" name="smsDesc" id="smsDesc" bind:value={tempDescSms} />
+							</div>
+							<div class="action-buttons">
+								<button class="buttonStyle" on:click={closeSms}>Annulla</button>
+								<button class="buttonStyle" on:click={saveSms}>Salva</button>
+							</div>
+						</div>
+					{/if}
+
+					{#if buttonStates.vocali}
+						<div class="customization-panel">
+							<p>Personalizzazione Notifica Vocale</p>
+							<div class="customizeNotificationStyle">
+								<label>Regola Volume</label>
+								<div class="volume-control">
+									<img src="img/volume_low.svg" alt="volume-low" class="volume-icon" />
 									<input
-										type="text"
-										name="emailTitle"
-										id="emailTitle"
-										bind:value={tempTitleEmail} />
-								</div>
-								<div class="windowPushBox">
-									<label for="emailDesc">Descrizione</label>
-									<input type="text" name="emailDesc" id="emailDesc" bind:value={tempDescEmail} />
-								</div>
-								<div class="windowPushAction">
-									<button class="buttonStyle" on:click={closeEmail}> Annulla </button>
-									<button class="buttonStyle" on:click={saveEmail}> Salva </button>
+										type="range"
+										min="0"
+										max="100"
+										value="50"
+										class="slider"
+										id="volume-slider" />
+									<img src="img/volume_high.svg" alt="volume-high" class="volume-icon" />
 								</div>
 							</div>
-						{/if}
-					</div>
-
-					<p class="notifiche-label">SMS</p>
-					<div class="sms">
-						<div class="box-notification-sms">
-							<div class="circle"><img src="img/pen.png" alt="" /></div>
-							<div class="textBox">
-								<h4>{titleSms}</h4>
-								<p class="paragraph-email">{descSms}</p>
-							</div>
-							<div class="box-notification-sms-buttons">
-								<button class="buttonStyle" on:click={() => toggleDialog('sms')}
-									>Modifica testo</button>
+							<div class="action-buttons">
+								<button class="buttonStyle">Personalizza Suono</button>
 							</div>
 						</div>
-						{#if dialogStates.sms}
-							<div class="windowPush">
-								<div class="windowPushBox">
-									<label for="smsTitle">Titolo</label>
-									<input type="text" name="smsTitle" id="smsTitle" bind:value={tempTitleSms} />
-								</div>
-								<div class="windowPushBox">
-									<label for="smsDesc">Descrizione</label>
-									<input type="text" name="smsDesc" id="smsDesc" bind:value={tempDescSms} />
-								</div>
-								<div class="windowPushAction">
-									<button class="buttonStyle" on:click={closeSms}> Annulla </button>
-									<button class="buttonStyle" on:click={saveSms}> Salva </button>
-								</div>
-							</div>
-						{/if}
-					</div>
-
-					<p class="notifiche-label">Vocali</p>
-					<div class="vocali">
-						<div class="box-notification-vocali">
-							<img src="img/Icon_vocale.svg" alt="Icon_vocale" />
-							<p>Notifica vocale personalizzata</p>
-						</div>
-						<div class="volume-control-container">
-							<div class="volume-control">
-								<img src="img/volume_low.svg" alt="volume-low" class="volume-icon" />
-								<input
-									type="range"
-									min="0"
-									max="100"
-									value="50"
-									class="slider"
-									id="volume-slider" />
-								<img src="img/volume_high.svg" alt="volume-high" class="volume-icon" />
-							</div>
-							<button class="sound-btn">
-								Personalizza suono
-								<img src="img/iconpers_sound.svg" alt="iconpers_sound" />
-							</button>
-						</div>
-					</div>
+					{/if}
 				</div>
 			{/if}
 		</div>
@@ -379,10 +386,10 @@
 									{@html icon.svgContent.replace(
 										'<svg',
 										`
-						<svg
-							fill="${icon.fill}"
-							stroke="${icon.stroke}"
-						`
+									<svg
+										fill="${icon.fill}"
+										stroke="${icon.stroke}"
+									`
 									)}
 								</div>
 
@@ -404,6 +411,29 @@
 							</div>
 						</div>
 					{/each}
+					<h3 class="h3-notification">Notifiche Salvate</h3>
+					{#each $notifications as notification, index}
+						<div class="saved-notification">
+							<div class="type-notification">{notification.type}</div>
+							<div class="notificationBox">
+								<div>
+									<img src="img/Account.png" alt="" />
+								</div>
+								<div class="notificationBoxContent">
+									<p class="titleNotificationBoxContent">{notification.title}</p>
+									<p class="descNotificationBoxContent">{notification.description}</p>
+								</div>
+							</div>
+							<div class="action-buttons">
+								<button class="buttonStyle" on:click={() => previewNotification(index)}>
+									Anteprima
+								</button>
+								<button class="buttonStyle" on:click={() => removeNotification(index)}>
+									Elimina
+								</button>
+							</div>
+						</div>
+					{/each}
 				</div>
 			{/if}
 		</div>
@@ -411,11 +441,114 @@
 </div>
 
 <style scoped>
+	.notificationBox {
+		display: flex;
+		margin-top: 4px;
+	}
+
+	.titleNotificationBoxContent {
+		font-size: 16px;
+		font-weight: 600;
+	}
+	.descNotificationBoxContent {
+		font-size: 12px;
+		font-weight: 500;
+	}
+
+	.notificationBoxContent {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		margin-top: 14px;
+		margin-left: 8px;
+	}
+	.h3-notification {
+		margin-top: 16px;
+		margin-bottom: 8px;
+		font-size: 14px;
+		margin-left: 8px;
+		font-weight: 600;
+	}
+	.saved-notification {
+		border: 1px solid black;
+		padding: 8px;
+		border-radius: 12px;
+		margin-bottom: 4px;
+		position: relative;
+	}
+
+	.type-notification {
+		position: absolute;
+		top: 4px;
+		right: 8px;
+		font-size: 12px;
+		font-weight: 600;
+		font-style: italic;
+	}
+	.customizeNotificationStyle {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 6px;
+	}
+
+	.customizeNotificationStyle label {
+		font-size: 12px;
+		font-weight: 600;
+	}
+
+	.customizeNotificationStyle input {
+		padding: 4px;
+	}
+	.customization-container {
+		margin-top: 20px;
+	}
+
+	.button-group {
+		display: flex;
+		gap: 6px;
+		justify-content: space-between;
+	}
+
+	.buttonStyleWide {
+		padding: 0.6rem 1rem;
+		cursor: pointer;
+	}
+
+	.customization-panel {
+		margin-top: 15px;
+		padding: 15px;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+		background: #f9f9f9;
+	}
+
+	.customization-panel p {
+		font-size: 18px;
+		font-weight: 600;
+		margin-bottom: 10px;
+	}
+
+	.action-buttons {
+		display: flex;
+		justify-content: end;
+		gap: 12px;
+		margin-top: 10px;
+	}
+
+	.buttonStyle {
+		padding: 8px 15px;
+	}
+
 	.saved-icon-item {
 		border: 1px solid black;
 		padding: 8px;
 		border-radius: 12px;
 		margin-bottom: 4px;
+	}
+
+	.accordion-content {
+		margin-top: 12px;
 	}
 	.saved-icon-item-box {
 		display: flex;
@@ -455,6 +588,13 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+	}
+
+	.accordion_tipologia_feedback_alt {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
 	}
 
 	.accordion_tipologia_feedback button {

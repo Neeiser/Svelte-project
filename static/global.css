@@ -422,6 +422,7 @@ cursor: pointer;
 }
 
 .mobilePreview {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
