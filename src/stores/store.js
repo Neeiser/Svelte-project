@@ -1,35 +1,52 @@
-﻿// store.js
-import { writable } from 'svelte/store';
+﻿import { writable } from 'svelte/store';
 
-// Verifica se siamo in ambiente browser
+// Funzione per verificare se siamo in ambiente browser
 function isBrowser() {
 	return typeof window !== 'undefined';
 }
 
-// Salva i dati nel sessionStorage
-function saveToSessionStorage(data) {
+// Salvataggio in sessionStorage
+function saveToSessionStorage(key, data) {
 	if (isBrowser()) {
-		sessionStorage.setItem('lastItem', JSON.stringify(data));
+		sessionStorage.setItem(key, JSON.stringify(data));
 	}
 }
 
-// Carica i dati dal sessionStorage
-function loadFromSessionStorage() {
+// Caricamento dal sessionStorage
+function loadFromSessionStorage(key) {
 	if (isBrowser()) {
-		const data = sessionStorage.getItem('lastItem');
-		return data ? JSON.parse(data) : null;
+		const data = sessionStorage.getItem(key);
+		return data ? JSON.parse(data) : [];
 	}
-	return null;
+	return [];
 }
 
-// Stato iniziale (carica l'ultimo elemento dal sessionStorage se presente)
-const initialItem = loadFromSessionStorage();
+// Store per icone salvate
+export const savedIcons = writable(loadFromSessionStorage('savedIcons'));
 
-// Creazione dello store
-export const lastItem = writable(initialItem);
+// Aggiungere un'icona all'array
+export function addSavedIcon(icon) {
+	savedIcons.update((icons) => {
+		const updatedIcons = [...icons, icon];
+		saveToSessionStorage('savedIcons', updatedIcons);
+		return updatedIcons;
+	});
+}
 
-// Funzione per aggiungere un elemento (sovrascrive l'ultimo)
-export function addItem(item) {
-	lastItem.set(item);
-	saveToSessionStorage(item);
+// Aggiornare il titolo di un'icona esistente
+export function updateIconTitle(index, newTitle) {
+	savedIcons.update((icons) => {
+		icons[index].title = newTitle;
+		saveToSessionStorage('savedIcons', icons);
+		return icons;
+	});
+}
+
+// Eliminare un'icona dallo store
+export function removeIcon(index) {
+	savedIcons.update((icons) => {
+		const updatedIcons = icons.filter((_, i) => i !== index);
+		saveToSessionStorage('savedIcons', updatedIcons);
+		return updatedIcons;
+	});
 }

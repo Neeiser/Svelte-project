@@ -1,7 +1,8 @@
 <script>
 	import { fly } from 'svelte/transition';
 	import FeedbackNotifiche from './Pagina2/+page.svelte';
-	import { lastItem } from '../stores/store.js'; // Importa il store
+	import { savedIcons } from '../stores/store'; // Importiamo lo store
+	import { previewIcon, setPreviewIcon } from '../stores/previewIconStore';
 
 	let showFeedbackNotifiche = false;
 
@@ -9,12 +10,14 @@
 		showFeedbackNotifiche = !showFeedbackNotifiche;
 	}
 
-	let currentItem = null; // Ultimo elemento inserito
-
-	// Sottoscrizione al store per aggiornare lo stato locale
-	lastItem.subscribe((item) => {
-		currentItem = item;
+	let selectedIcon = null;
+	$: previewIcon.subscribe((icon) => {
+		selectedIcon = icon;
 	});
+
+	function previewIconHandler(event) {
+		setPreviewIcon(event.detail);
+	}
 </script>
 
 <header style="z-index: 100;">
@@ -88,7 +91,9 @@
 	<div class="content">
 		{#if showFeedbackNotifiche}
 			<div transition:fly={{ x: -600, duration: 300 }} style="z-index: 50;">
-				<FeedbackNotifiche on:closeFeedback={toggleFeedbackNotifiche} />
+				<FeedbackNotifiche
+					on:closeFeedback={toggleFeedbackNotifiche}
+					on:previewIcon={(event) => previewIconHandler(event)} />
 			</div>
 		{/if}
 		<div class="leftShoulder">
@@ -201,17 +206,15 @@
 
 		<div class="centeredContent">
 			<div class="mobilePreview">
-				{#if currentItem && currentItem.type === 'icon'}
+				{#if selectedIcon}
 					<div
-						class={currentItem.animationType || ''}
-						style="animation-duration: {currentItem.animationSpeed || 2}s;">
-						{@html currentItem.svgContent.replace(
+						class={selectedIcon.animationType || ''}
+						style="animation-duration: {selectedIcon.animationSpeed || 2}s;">
+						{@html selectedIcon.svgContent.replace(
 							'<svg',
 							`
-							<svg
-								fill="${currentItem.fill}"
-								stroke="${currentItem.stroke}"
-						`
+					<svg fill="${selectedIcon.fill}" stroke="${selectedIcon.stroke}"
+				`
 						)}
 					</div>
 				{/if}

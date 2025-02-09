@@ -1,6 +1,7 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
-	import { addItem } from '../../stores/store';
+	import { addSavedIcon } from '../../stores/store';
+	import { setPreviewIcon, clearPreviewIcon } from '../../stores/previewIconStore';
 	const dispatch = createEventDispatcher();
 
 	let accordionStates = {
@@ -51,19 +52,14 @@
 	}
 
 	let selectedIcon = '';
-	let showColorPicker = false;
 	let selectedSvgContent = '';
 	let selectedStroke = '#000000';
 	let selectedFill = '#000000';
-
-	// Nuove variabili per animazione
-	let animationType = ''; // può essere rotateClockwise, rotateAntiClockwise, ping, o ''
-	let animationSpeed = 2; // in secondi
+	let animationType = '';
+	let animationSpeed = 2;
 
 	function handleIconClick(iconSrc) {
 		selectedIcon = iconSrc;
-		showColorPicker = true;
-
 		fetch(iconSrc)
 			.then((response) => response.text())
 			.then((data) => {
@@ -72,33 +68,28 @@
 				const svgElement = svgDoc.querySelector('svg');
 
 				if (svgElement) {
-					// Rimuove fill e stroke da eventuali path interni
 					svgElement.querySelectorAll('*').forEach((el) => {
 						el.removeAttribute('fill');
 						el.removeAttribute('stroke');
 					});
-
 					selectedSvgContent = new XMLSerializer().serializeToString(svgElement);
+
+					// Aggiorna l'anteprima nel padre e nel figlio stesso
+					setPreviewIcon({
+						svgContent: selectedSvgContent,
+						fill: selectedFill,
+						stroke: selectedStroke,
+						animationType,
+						animationSpeed,
+					});
 				}
-				// Aggiorniamo subito lo store, con valori di default
-				addItem({
-					type: 'icon',
-					src: selectedIcon,
-					svgContent: selectedSvgContent,
-					fill: selectedFill,
-					stroke: selectedStroke,
-					animationType,
-					animationSpeed,
-				});
 			})
 			.catch((error) => console.error('Errore nel recupero dei dati SVG:', error));
 	}
 
 	function handleFillChange(event) {
 		selectedFill = event.target.value;
-		addItem({
-			type: 'icon',
-			src: selectedIcon,
+		setPreviewIcon({
 			svgContent: selectedSvgContent,
 			fill: selectedFill,
 			stroke: selectedStroke,
@@ -109,9 +100,7 @@
 
 	function handleStrokeChange(event) {
 		selectedStroke = event.target.value;
-		addItem({
-			type: 'icon',
-			src: selectedIcon,
+		setPreviewIcon({
 			svgContent: selectedSvgContent,
 			fill: selectedFill,
 			stroke: selectedStroke,
@@ -120,12 +109,9 @@
 		});
 	}
 
-	// Quando l'utente sceglie il tipo di animazione
 	function handleAnimationTypeChange(event) {
 		animationType = event.target.value;
-		addItem({
-			type: 'icon',
-			src: selectedIcon,
+		setPreviewIcon({
 			svgContent: selectedSvgContent,
 			fill: selectedFill,
 			stroke: selectedStroke,
@@ -134,18 +120,44 @@
 		});
 	}
 
-	// Quando l'utente sceglie la velocità
 	function handleAnimationSpeedChange(event) {
-		animationSpeed = +event.target.value; // convertiamo in numero
-		addItem({
-			type: 'icon',
-			src: selectedIcon,
+		animationSpeed = +event.target.value;
+		setPreviewIcon({
 			svgContent: selectedSvgContent,
 			fill: selectedFill,
 			stroke: selectedStroke,
 			animationType,
 			animationSpeed,
 		});
+	}
+
+	// Funzione per salvare l'icona personalizzata
+	function saveIcon() {
+		// Qui si salva l'icona nello store principale
+		addSavedIcon({
+			title: 'Titolo default',
+			svgContent: selectedSvgContent,
+			fill: selectedFill,
+			stroke: selectedStroke,
+			animationType,
+			animationSpeed,
+		});
+
+		// Resetta tutti gli accordion e i bottoni
+		Object.keys(accordionStates).forEach((key) => {
+			accordionStates[key] = false;
+		});
+		Object.keys(buttonStates).forEach((key) => {
+			buttonStates[key] = false;
+		});
+
+		// Una volta salvata l'icona, rimuoviamo l'anteprima
+		clearPreviewIcon();
+	}
+
+	// Rimuove l'anteprima quando si esce dalla pagina
+	function closePage() {
+		clearPreviewIcon();
 	}
 </script>
 
@@ -178,26 +190,30 @@
 								<img src="img/cerchio_caricamento_linee.svg" alt="icon" />
 							</button>
 						</div>
-						{#if showColorPicker}
-							<div class="color-picker">
-								<label for="fillColor">Seleziona riempimento:</label>
-								<input
-									type="color"
-									id="fillColor"
-									bind:value={selectedFill}
-									on:input={handleFillChange} />
-							</div>
-							<div class="color-picker">
-								<label for="strokeColor">Seleziona traccia:</label>
-								<input
-									type="color"
-									id="strokeColor"
-									bind:value={selectedStroke}
-									on:input={handleStrokeChange} />
-							</div>
+						{#if selectedIcon}
 							<div class="animationOptions">
-								<h3>Animazione icona</h3>
-								<div>
+								<p>Personalizza colore</p>
+
+								<div class="color-picker-custom">
+									<label for="fillColor">Riempimento:</label>
+									<input
+										type="color"
+										id="fillColor"
+										bind:value={selectedFill}
+										on:input={handleFillChange} />
+								</div>
+
+								<div class="color-picker-custom">
+									<label for="strokeColor">Traccia:</label>
+									<input
+										type="color"
+										id="strokeColor"
+										bind:value={selectedStroke}
+										on:input={handleStrokeChange} />
+								</div>
+
+								<p class="p-animations">Personalizza animazione</p>
+								<div class="animations-radio">
 									<label>
 										<input
 											type="radio"
@@ -220,32 +236,26 @@
 										<input
 											type="radio"
 											name="animation"
-											value="rotateAntiClockwise"
-											on:change={handleAnimationTypeChange}
-											checked={animationType === 'rotateAntiClockwise'} />
-										Rotazione Antioraria
-									</label>
-									<label>
-										<input
-											type="radio"
-											name="animation"
 											value="ping"
 											on:change={handleAnimationTypeChange}
 											checked={animationType === 'ping'} />
 										Ping
 									</label>
-								</div>
-								<div>
-									<label for="animationSpeed">Velocità (secondi):</label>
-									<input
-										type="number"
-										id="animationSpeed"
-										min="0.1"
-										step="0.1"
-										bind:value={animationSpeed}
-										on:change={handleAnimationSpeedChange} />
+									<div>
+										<label for="animationSpeed">Velocità (secondi):</label>
+										<input
+											type="number"
+											id="animationSpeed"
+											min="0.1"
+											step="0.1"
+											bind:value={animationSpeed}
+											on:change={handleAnimationSpeedChange} />
+									</div>
 								</div>
 							</div>
+
+							<!-- Pulsante per salvare l'icona -->
+							<button class="buttonStyleWide" on:click={saveIcon}>Salva Icona</button>
 						{/if}
 					</div>
 				{/if}
@@ -270,26 +280,30 @@
 								<img src="img/ok.svg" alt="icon" />
 							</button>
 						</div>
-						{#if showColorPicker}
-							<div class="color-picker">
-								<label for="fillColor">Seleziona riempimento:</label>
-								<input
-									type="color"
-									id="fillColor"
-									bind:value={selectedFill}
-									on:input={handleFillChange} />
-							</div>
-							<div class="color-picker">
-								<label for="strokeColor">Seleziona traccia:</label>
-								<input
-									type="color"
-									id="strokeColor"
-									bind:value={selectedStroke}
-									on:input={handleStrokeChange} />
-							</div>
+						{#if selectedIcon}
 							<div class="animationOptions">
-								<h3>Animazione icona</h3>
-								<div>
+								<p>Personalizza colore</p>
+
+								<div class="color-picker-custom">
+									<label for="fillColor">Riempimento:</label>
+									<input
+										type="color"
+										id="fillColor"
+										bind:value={selectedFill}
+										on:input={handleFillChange} />
+								</div>
+
+								<div class="color-picker-custom">
+									<label for="strokeColor">Traccia:</label>
+									<input
+										type="color"
+										id="strokeColor"
+										bind:value={selectedStroke}
+										on:input={handleStrokeChange} />
+								</div>
+
+								<p class="p-animations">Personalizza animazione</p>
+								<div class="animations-radio">
 									<label>
 										<input
 											type="radio"
@@ -312,32 +326,26 @@
 										<input
 											type="radio"
 											name="animation"
-											value="rotateAntiClockwise"
-											on:change={handleAnimationTypeChange}
-											checked={animationType === 'rotateAntiClockwise'} />
-										Rotazione Antioraria
-									</label>
-									<label>
-										<input
-											type="radio"
-											name="animation"
 											value="ping"
 											on:change={handleAnimationTypeChange}
 											checked={animationType === 'ping'} />
 										Ping
 									</label>
-								</div>
-								<div>
-									<label for="animationSpeed">Velocità (secondi):</label>
-									<input
-										type="number"
-										id="animationSpeed"
-										min="0.1"
-										step="0.1"
-										bind:value={animationSpeed}
-										on:change={handleAnimationSpeedChange} />
+									<div>
+										<label for="animationSpeed">Velocità (secondi):</label>
+										<input
+											type="number"
+											id="animationSpeed"
+											min="0.1"
+											step="0.1"
+											bind:value={animationSpeed}
+											on:change={handleAnimationSpeedChange} />
+									</div>
 								</div>
 							</div>
+
+							<!-- Pulsante per salvare l'icona -->
+							<button class="buttonStyleWide" on:click={saveIcon}>Salva Icona</button>
 						{/if}
 					</div>
 				{/if}
@@ -360,26 +368,30 @@
 								<img src="img/attention.svg" alt="icon" />
 							</button>
 						</div>
-						{#if showColorPicker}
-							<div class="color-picker">
-								<label for="fillColor">Seleziona riempimento:</label>
-								<input
-									type="color"
-									id="fillColor"
-									bind:value={selectedFill}
-									on:input={handleFillChange} />
-							</div>
-							<div class="color-picker">
-								<label for="strokeColor">Seleziona traccia:</label>
-								<input
-									type="color"
-									id="strokeColor"
-									bind:value={selectedStroke}
-									on:input={handleStrokeChange} />
-							</div>
+						{#if selectedIcon}
 							<div class="animationOptions">
-								<h3>Animazione icona</h3>
-								<div>
+								<p>Personalizza colore</p>
+
+								<div class="color-picker-custom">
+									<label for="fillColor">Riempimento:</label>
+									<input
+										type="color"
+										id="fillColor"
+										bind:value={selectedFill}
+										on:input={handleFillChange} />
+								</div>
+
+								<div class="color-picker-custom">
+									<label for="strokeColor">Traccia:</label>
+									<input
+										type="color"
+										id="strokeColor"
+										bind:value={selectedStroke}
+										on:input={handleStrokeChange} />
+								</div>
+
+								<p class="p-animations">Personalizza animazione</p>
+								<div class="animations-radio">
 									<label>
 										<input
 											type="radio"
@@ -402,32 +414,26 @@
 										<input
 											type="radio"
 											name="animation"
-											value="rotateAntiClockwise"
-											on:change={handleAnimationTypeChange}
-											checked={animationType === 'rotateAntiClockwise'} />
-										Rotazione Antioraria
-									</label>
-									<label>
-										<input
-											type="radio"
-											name="animation"
 											value="ping"
 											on:change={handleAnimationTypeChange}
 											checked={animationType === 'ping'} />
 										Ping
 									</label>
-								</div>
-								<div>
-									<label for="animationSpeed">Velocità (secondi):</label>
-									<input
-										type="number"
-										id="animationSpeed"
-										min="0.1"
-										step="0.1"
-										bind:value={animationSpeed}
-										on:change={handleAnimationSpeedChange} />
+									<div>
+										<label for="animationSpeed">Velocità (secondi):</label>
+										<input
+											type="number"
+											id="animationSpeed"
+											min="0.1"
+											step="0.1"
+											bind:value={animationSpeed}
+											on:change={handleAnimationSpeedChange} />
+									</div>
 								</div>
 							</div>
+
+							<!-- Pulsante per salvare l'icona -->
+							<button class="buttonStyleWide" on:click={saveIcon}>Salva Icona</button>
 						{/if}
 					</div>
 				{/if}
@@ -448,26 +454,30 @@
 								<img src="img/barra_caricamento2.svg" alt="icon" />
 							</button>
 						</div>
-						{#if showColorPicker}
-							<div class="color-picker">
-								<label for="fillColor">Seleziona riempimento:</label>
-								<input
-									type="color"
-									id="fillColor"
-									bind:value={selectedFill}
-									on:input={handleFillChange} />
-							</div>
-							<div class="color-picker">
-								<label for="strokeColor">Seleziona traccia:</label>
-								<input
-									type="color"
-									id="strokeColor"
-									bind:value={selectedStroke}
-									on:input={handleStrokeChange} />
-							</div>
+						{#if selectedIcon}
 							<div class="animationOptions">
-								<h3>Animazione icona</h3>
-								<div>
+								<p>Personalizza colore</p>
+
+								<div class="color-picker-custom">
+									<label for="fillColor">Riempimento:</label>
+									<input
+										type="color"
+										id="fillColor"
+										bind:value={selectedFill}
+										on:input={handleFillChange} />
+								</div>
+
+								<div class="color-picker-custom">
+									<label for="strokeColor">Traccia:</label>
+									<input
+										type="color"
+										id="strokeColor"
+										bind:value={selectedStroke}
+										on:input={handleStrokeChange} />
+								</div>
+
+								<p class="p-animations">Personalizza animazione</p>
+								<div class="animations-radio">
 									<label>
 										<input
 											type="radio"
@@ -490,32 +500,26 @@
 										<input
 											type="radio"
 											name="animation"
-											value="rotateAntiClockwise"
-											on:change={handleAnimationTypeChange}
-											checked={animationType === 'rotateAntiClockwise'} />
-										Rotazione Antioraria
-									</label>
-									<label>
-										<input
-											type="radio"
-											name="animation"
 											value="ping"
 											on:change={handleAnimationTypeChange}
 											checked={animationType === 'ping'} />
 										Ping
 									</label>
-								</div>
-								<div>
-									<label for="animationSpeed">Velocità (secondi):</label>
-									<input
-										type="number"
-										id="animationSpeed"
-										min="0.1"
-										step="0.1"
-										bind:value={animationSpeed}
-										on:change={handleAnimationSpeedChange} />
+									<div>
+										<label for="animationSpeed">Velocità (secondi):</label>
+										<input
+											type="number"
+											id="animationSpeed"
+											min="0.1"
+											step="0.1"
+											bind:value={animationSpeed}
+											on:change={handleAnimationSpeedChange} />
+									</div>
 								</div>
 							</div>
+
+							<!-- Pulsante per salvare l'icona -->
+							<button class="buttonStyleWide" on:click={saveIcon}>Salva Icona</button>
 						{/if}
 					</div>
 				{/if}
@@ -537,26 +541,30 @@
 								<img src="img/chat.svg" alt="icon" />
 							</button>
 						</div>
-						{#if showColorPicker}
-							<div class="color-picker">
-								<label for="fillColor">Seleziona riempimento:</label>
-								<input
-									type="color"
-									id="fillColor"
-									bind:value={selectedFill}
-									on:input={handleFillChange} />
-							</div>
-							<div class="color-picker">
-								<label for="strokeColor">Seleziona traccia:</label>
-								<input
-									type="color"
-									id="strokeColor"
-									bind:value={selectedStroke}
-									on:input={handleStrokeChange} />
-							</div>
+						{#if selectedIcon}
 							<div class="animationOptions">
-								<h3>Animazione icona</h3>
-								<div>
+								<p>Personalizza colore</p>
+
+								<div class="color-picker-custom">
+									<label for="fillColor">Riempimento:</label>
+									<input
+										type="color"
+										id="fillColor"
+										bind:value={selectedFill}
+										on:input={handleFillChange} />
+								</div>
+
+								<div class="color-picker-custom">
+									<label for="strokeColor">Traccia:</label>
+									<input
+										type="color"
+										id="strokeColor"
+										bind:value={selectedStroke}
+										on:input={handleStrokeChange} />
+								</div>
+
+								<p class="p-animations">Personalizza animazione</p>
+								<div class="animations-radio">
 									<label>
 										<input
 											type="radio"
@@ -579,32 +587,26 @@
 										<input
 											type="radio"
 											name="animation"
-											value="rotateAntiClockwise"
-											on:change={handleAnimationTypeChange}
-											checked={animationType === 'rotateAntiClockwise'} />
-										Rotazione Antioraria
-									</label>
-									<label>
-										<input
-											type="radio"
-											name="animation"
 											value="ping"
 											on:change={handleAnimationTypeChange}
 											checked={animationType === 'ping'} />
 										Ping
 									</label>
-								</div>
-								<div>
-									<label for="animationSpeed">Velocità (secondi):</label>
-									<input
-										type="number"
-										id="animationSpeed"
-										min="0.1"
-										step="0.1"
-										bind:value={animationSpeed}
-										on:change={handleAnimationSpeedChange} />
+									<div>
+										<label for="animationSpeed">Velocità (secondi):</label>
+										<input
+											type="number"
+											id="animationSpeed"
+											min="0.1"
+											step="0.1"
+											bind:value={animationSpeed}
+											on:change={handleAnimationSpeedChange} />
+									</div>
 								</div>
 							</div>
+
+							<!-- Pulsante per salvare l'icona -->
+							<button class="buttonStyleWide" on:click={saveIcon}>Salva Icona</button>
 						{/if}
 					</div>
 				{/if}
@@ -668,5 +670,27 @@
 		padding: 1rem;
 		border: 1px solid #ccc;
 		border-radius: 6px;
+	}
+	.animationOptions p {
+		font-weight: 600;
+		font-size: 18px;
+		margin-bottom: 16px;
+	}
+
+	.color-picker-custom {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 8px;
+	}
+
+	.p-animations {
+		margin-top: 16px;
+	}
+
+	.animations-radio {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
 	}
 </style>

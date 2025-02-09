@@ -5,6 +5,40 @@
 	import FeedbackTestuale from '../Pagina4/+page.svelte';
 	import FeedbackSonoro from '../Pagina5/+page.svelte';
 	import FeedbackTattile from '../Pagina6/+page.svelte';
+	import { savedIcons, updateIconTitle, removeIcon } from '../../stores/store'; // Importiamo lo store
+	import { previewIcon, setPreviewIcon } from '../../stores/previewIconStore';
+
+	function previewIconHandler(icon) {
+		setPreviewIcon(icon);
+	}
+
+	let savedIconsList = [];
+	let editingIndex = null; // Indice dell'icona che sta venendo rinominata
+	let newTitle = ''; // Nuovo titolo da modificare
+
+	// Sottoscrizione per ottenere la lista completa delle icone salvate
+	savedIcons.subscribe((icons) => {
+		savedIconsList = icons;
+	});
+
+	// Attiva il campo di modifica del titolo
+	function startEditing(index) {
+		editingIndex = index;
+		newTitle = savedIconsList[index].title; // Precompiliamo con il titolo attuale
+	}
+
+	// Salva il nuovo titolo e aggiorna lo store
+	function saveNewTitle(index) {
+		if (newTitle.trim() !== '') {
+			updateIconTitle(index, newTitle);
+		}
+		editingIndex = null;
+	}
+
+	// Rimuove l'icona selezionata dallo store
+	function deleteIcon(index) {
+		removeIcon(index);
+	}
 
 	let accordionStates = {
 		tipologia_feedback: false,
@@ -336,29 +370,68 @@
 			</div>
 			{#if accordionStates.i_miei_feedback_notifiche}
 				<div id="i_miei_feedback_notifiche" class="accordion-content">
-					<p class="feedback-text" style="margin-bottom: 20px;">Feedback</p>
-					<div class="myfeedback">
-						<div class="box-myfeedback">
-							<img src="img/Myfeedback.svg" alt="myfeedback" />
-						</div>
-					</div>
+					{#each savedIconsList as icon, index}
+						<div class="saved-icon-item">
+							<div class="saved-icon-item-box">
+								<div
+									class={icon.animationType || ''}
+									style="animation-duration: {icon.animationSpeed || 2}s;">
+									{@html icon.svgContent.replace(
+										'<svg',
+										`
+						<svg
+							fill="${icon.fill}"
+							stroke="${icon.stroke}"
+						`
+									)}
+								</div>
 
-					<p class="notifiche-text" style="margin-top:70px;">Notifiche</p>
-					<div class="mynotifiche">
-						<div class="box-mynotifiche">
-							<img src="img/icona_notifica.svg" alt="notifiche" />
-							<img src="img/text_notifica.svg" alt="text-notifiche" />
+								<!-- Se l'icona è in modalità modifica, mostriamo un input -->
+								{#if editingIndex === index}
+									<input type="text" bind:value={newTitle} class="rename-input" />
+								{:else}
+									<p>{icon.title}</p>
+								{/if}
+							</div>
+							<div class="saved-icon-item-action">
+								{#if editingIndex === index}
+									<button on:click={() => saveNewTitle(index)}>Salva</button>
+								{:else}
+									<button on:click={() => startEditing(index)}>Rinomina</button>
+								{/if}
+								<button on:click={() => previewIconHandler(icon)}>Anteprima</button>
+								<button on:click={() => deleteIcon(index)}>Elimina</button>
+							</div>
 						</div>
-					</div>
+					{/each}
 				</div>
 			{/if}
 		</div>
-
-		<!-- <button class="button_feedback">Salva modifiche</button> -->
 	</div>
 </div>
 
 <style scoped>
+	.saved-icon-item {
+		border: 1px solid black;
+		padding: 8px;
+		border-radius: 12px;
+		margin-bottom: 4px;
+	}
+	.saved-icon-item-box {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.saved-icon-item-action {
+		display: flex;
+		gap: 4px;
+		justify-content: end;
+	}
+
+	.saved-icon-item-action button {
+		padding: 6px;
+	}
 	.backButton {
 		position: absolute;
 		top: 10px;
@@ -462,5 +535,71 @@
 		text-overflow: ellipsis;
 		overflow: hidden;
 		padding-bottom: 8px;
+	}
+
+	.pulse {
+		background: rgb(255, 255, 255);
+		box-shadow: 0 0 0 0 rgba(0, 0, 0, 1);
+		transform: scale(1);
+		animation: pulse 2s infinite;
+	}
+
+	@keyframes pulse {
+		0% {
+			transform: scale(0.95);
+			box-shadow: 0 0 0 0 #927c81;
+		}
+
+		70% {
+			transform: scale(1);
+			box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
+		}
+
+		100% {
+			transform: scale(0.95);
+			box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+		}
+	}
+
+	@keyframes rotateClockwise {
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	@keyframes rotateAntiClockwise {
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(-360deg);
+		}
+	}
+
+	@keyframes ping {
+		0% {
+			transform: scale(1);
+		}
+		50% {
+			transform: scale(1.2);
+		}
+		100% {
+			transform: scale(1);
+		}
+	}
+
+	.rotateClockwise {
+		animation: rotateClockwise linear infinite;
+	}
+
+	.rotateAntiClockwise {
+		animation: rotateAntiClockwise linear infinite;
+	}
+
+	.ping {
+		animation: ping ease-in-out infinite;
 	}
 </style>
