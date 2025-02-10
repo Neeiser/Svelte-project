@@ -742,4 +742,8 @@
 	.ping {
 		animation: ping ease-in-out infinite;
 	}
+
+	#i_miei_feedback_notifiche {
+		margin-bottom: 54px;
+	}
 </style>

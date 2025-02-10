@@ -1,5 +1,9 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
+	import { messageStore, addMessage, removeMessage } from '../../stores/messageStore';
+	import { savedIcons, updateIconDescription } from '../../stores/store';
+	import { writable } from 'svelte/store';
+
 	const dispatch = createEventDispatcher();
 
 	// Stati per tenere traccia di quali sezioni sono aperte
@@ -11,10 +15,65 @@
 	};
 
 	function toggleButtonContent(section) {
-		sections = {
-			...sections,
-			[section]: !sections[section], // Inverte lo stato della sezione specifica
-		};
+		showCombine = false;
+		// Chiude tutte le sezioni, poi apre solo quella selezionata
+		Object.keys(sections).forEach((key) => {
+			sections[key] = key === section ? !sections[key] : false;
+		});
+	}
+
+	// Input per i messaggi personalizzati
+	let newMessage = '';
+	let selectedSection = '';
+
+	// Store locale per la reattività
+	let messages = writable({ conferma: [], errore: [], attesa: [], supporto: [] });
+
+	// Sincronizza lo store locale con quello globale
+	messageStore.subscribe((value) => {
+		messages.set(value);
+	});
+
+	// Store per le icone salvate
+	let icons = [];
+	savedIcons.subscribe((value) => {
+		icons = value;
+	});
+
+	// Variabili per la combinazione icona + messaggio
+	let showCombine = false;
+	let selectedIconId = null;
+	let selectedMessage = '';
+
+	// Funzione per aprire il form di personalizzazione
+	function openCustomization(section) {
+		selectedSection = section;
+		newMessage = '';
+	}
+
+	// Funzione per salvare il messaggio nello store
+	function saveMessage() {
+		if (newMessage.trim() && selectedSection) {
+			addMessage(selectedSection, newMessage);
+			newMessage = ''; // Resetta l'input dopo il salvataggio
+			selectedSection = '';
+		}
+	}
+
+	// Funzione per aprire la finestra di combinazione
+	function openCombine(message) {
+		selectedMessage = message;
+		showCombine = true;
+	}
+
+	// Funzione per confermare la combinazione
+	function confirmCombination() {
+		console.log(selectedIconId, selectedMessage);
+		if (selectedMessage) {
+			updateIconDescription(Number(selectedIconId), selectedMessage);
+			showCombine = false;
+			console.log(selectedIconId, selectedMessage);
+		}
 	}
 </script>
 
@@ -37,15 +96,43 @@
 				</button>
 				{#if sections.messaggi_conferma}
 					<div class="button-content messaggi_style">
-						<div class="button-testuale">
-							<select>
-								<option>Salvataggio dei dati avvenuto con successo</option>
-								<option>Procedi con l'eliminazione?</option>
-								<option>Sei sicuro di voler continuare?</option>
-							</select>
-						</div>
-						<button class="btn-pers-testuale">Personalizza testo</button>
+						<ul>
+							{#each $messages.conferma as message, index}
+								<li>
+									{message}
+									<button class="btn-combine" on:click={() => openCombine(message)}>Combina</button>
+									<button class="delete-btn" on:click={() => removeMessage('conferma', index)}
+										>❌</button>
+								</li>
+							{/each}
+						</ul>
+
+						{#if selectedSection === 'conferma'}
+							<div class="message-customization">
+								<input
+									type="text"
+									bind:value={newMessage}
+									placeholder="Scrivi il tuo messaggio..." />
+								<button class="btn-save" on:click={saveMessage}>Salva</button>
+							</div>
+						{/if}
+
+						<button class="btn-pers-testuale" on:click={() => openCustomization('conferma')}
+							>Crea messaggio</button>
 					</div>
+					{#if showCombine}
+						<div class="combine-box">
+							<h3>Combina Messaggio con Icona</h3>
+							<select bind:value={selectedIconId}>
+								<option value="" disabled selected>Seleziona un'icona</option>
+								{#each icons as icon}
+									<option value={icon.id}>{icon.title}</option>
+								{/each}
+							</select>
+							<button class="btn-combine" on:click={confirmCombination}
+								>Conferma combinazione</button>
+						</div>
+					{/if}
 				{/if}
 
 				<!-- Messaggi di Errore -->
@@ -55,15 +142,45 @@
 				</button>
 				{#if sections.messaggi_errore}
 					<div class="button-content messaggi_style">
-						<div class="button-testuale">
-							<select>
-								<option>Errore nel caricamento, riprova più tardi</option>
-								<option>Caricamento non riuscito</option>
-								<option>Non è stato possibile effettuare l’operazione</option>
-							</select>
-						</div>
-						<button class="btn-pers-testuale">Personalizza testo</button>
+						<ul>
+							{#each $messages.errore as message, index}
+								<li>
+									{message}
+									<button class="btn-combine" on:click={() => openCombine(message)}>Combina</button>
+									<button class="delete-btn" on:click={() => removeMessage('errore', index)}
+										>❌</button>
+								</li>
+							{/each}
+						</ul>
+
+						{#if selectedSection === 'errore'}
+							<div class="message-customization">
+								<input
+									type="text"
+									bind:value={newMessage}
+									placeholder="Scrivi il tuo messaggio..."
+									class="message-input" />
+								<button class="btn-save" on:click={saveMessage}>Salva</button>
+							</div>
+						{/if}
+
+						<button class="btn-pers-testuale" on:click={() => openCustomization('errore')}>
+							Crea messaggio
+						</button>
 					</div>
+					{#if showCombine}
+						<div class="combine-box">
+							<h3>Combina Messaggio con Icona</h3>
+							<select bind:value={selectedIconId}>
+								<option value="" disabled selected>Seleziona un'icona</option>
+								{#each icons as icon}
+									<option value={icon.id}>{icon.title}</option>
+								{/each}
+							</select>
+							<button class="btn-combine" on:click={confirmCombination}
+								>Conferma combinazione</button>
+						</div>
+					{/if}
 				{/if}
 
 				<!-- Messaggi di Caricamento e Attesa -->
@@ -75,16 +192,45 @@
 				</button>
 				{#if sections.messaggi_caricamento_attesa}
 					<div class="button-content messaggi_style">
-						<div class="button-testuale">
-							<select>
-								<option>Stiamo elaborando la tua richiesta</option>
-								<option>Quasi fatto! Ci vuole ancora un attimo.</option>
-								<option>Caricamento in corso</option>
-								<option>Attendere prego</option>
-							</select>
-						</div>
-						<button class="btn-pers-testuale">Personalizza testo</button>
+						<ul>
+							{#each $messages.attesa as message, index}
+								<li>
+									{message}
+									<button class="btn-combine" on:click={() => openCombine(message)}>Combina</button>
+									<button class="delete-btn" on:click={() => removeMessage('attesa', index)}
+										>❌</button>
+								</li>
+							{/each}
+						</ul>
+
+						{#if selectedSection === 'attesa'}
+							<div class="message-customization">
+								<input
+									type="text"
+									bind:value={newMessage}
+									placeholder="Scrivi il tuo messaggio..."
+									class="message-input" />
+								<button class="btn-save" on:click={saveMessage}>Salva</button>
+							</div>
+						{/if}
+
+						<button class="btn-pers-testuale" on:click={() => openCustomization('attesa')}>
+							Crea messaggio
+						</button>
 					</div>
+					{#if showCombine}
+						<div class="combine-box">
+							<h3>Combina Messaggio con Icona</h3>
+							<select bind:value={selectedIconId}>
+								<option value="" disabled selected>Seleziona un'icona</option>
+								{#each icons as icon}
+									<option value={icon.id}>{icon.title}</option>
+								{/each}
+							</select>
+							<button class="btn-combine" on:click={confirmCombination}
+								>Conferma combinazione</button>
+						</div>
+					{/if}
 				{/if}
 
 				<!-- Messaggi di Aiuto e Supporto -->
@@ -96,17 +242,45 @@
 				</button>
 				{#if sections.messaggi_aiuto_supporto}
 					<div class="button-content messaggi_style">
-						<div class="button-testuale">
-							<select>
-								<option>Hai bisogno di assistenza? Siamo qui per aiutarti!</option>
-								<option>Domande? Scopri le risposte nella nostra sezione di supporto</option>
-								<option
-									>Hai bisogno di supporto? Invia una segnalazione e ti risponderemo presto</option>
-								<option>Qualcosa non va? Il nostro team di supporto è qui per te</option>
-							</select>
-						</div>
-						<button class="btn-pers-testuale">Personalizza testo</button>
+						<ul>
+							{#each $messages.supporto as message, index}
+								<li>
+									{message}
+									<button class="btn-combine" on:click={() => openCombine(message)}>Combina</button>
+									<button class="delete-btn" on:click={() => removeMessage('supporto', index)}
+										>❌</button>
+								</li>
+							{/each}
+						</ul>
+
+						{#if selectedSection === 'supporto'}
+							<div class="message-customization">
+								<input
+									type="text"
+									bind:value={newMessage}
+									placeholder="Scrivi il tuo messaggio..."
+									class="message-input" />
+								<button class="btn-save" on:click={saveMessage}>Salva</button>
+							</div>
+						{/if}
+
+						<button class="btn-pers-testuale" on:click={() => openCustomization('supporto')}>
+							Crea messaggio
+						</button>
 					</div>
+					{#if showCombine}
+						<div class="combine-box">
+							<h3>Combina Messaggio con Icona</h3>
+							<select bind:value={selectedIconId}>
+								<option value="" disabled selected>Seleziona un'icona</option>
+								{#each icons as icon}
+									<option value={icon.id}>{icon.title}</option>
+								{/each}
+							</select>
+							<button class="btn-combine" on:click={confirmCombination}
+								>Conferma combinazione</button>
+						</div>
+					{/if}
 				{/if}
 			</div>
 		</div>
@@ -144,11 +318,55 @@
 		align-items: center;
 	}
 
+	.btn-save {
+		padding: 8px;
+	}
+
 	.messaggi_style {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		gap: 8px;
 		padding: 12px 0px;
+	}
+
+	.btn-pers-testuale {
+		padding: 8px;
+		margin-top: 0px;
+	}
+
+	.messaggi_style ul {
+		list-style: none;
+		padding: 0;
+	}
+
+	.messaggi_style li {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		background: white;
+		padding: 8px;
+		border-radius: 4px;
+		margin-bottom: 4px;
+	}
+
+	.message-customization {
+		margin-top: 12px;
+		padding: 12px;
+		background: #f4f4f4;
+		border-radius: 8px;
+		display: flex;
+		gap: 8px;
+	}
+
+	.delete-btn {
+		padding: 4px;
+		margin-left: 8px;
+		margin-right: 8px;
+	}
+
+	.btn-combine {
+		padding: 6px;
+		margin-left: 8px;
 	}
 </style>

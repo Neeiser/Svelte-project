@@ -57,6 +57,8 @@
 	let selectedFill = '#000000';
 	let animationType = '';
 	let animationSpeed = 2;
+	let scaleSize = 1; // Default 1x
+	let displayDuration = 5; // Default 5 secondi
 
 	function handleIconClick(iconSrc) {
 		selectedIcon = iconSrc;
@@ -74,63 +76,55 @@
 					});
 					selectedSvgContent = new XMLSerializer().serializeToString(svgElement);
 
-					// Aggiorna l'anteprima nel padre e nel figlio stesso
-					setPreviewIcon({
-						svgContent: selectedSvgContent,
-						fill: selectedFill,
-						stroke: selectedStroke,
-						animationType,
-						animationSpeed,
-					});
+					updatePreviewIcon(); // Assicuriamo che l'icona aggiorni correttamente
 				}
 			})
 			.catch((error) => console.error('Errore nel recupero dei dati SVG:', error));
 	}
 
+	function handleScaleChange(event) {
+		scaleSize = event.target.value;
+		updatePreviewIcon();
+	}
+
 	function handleFillChange(event) {
 		selectedFill = event.target.value;
-		setPreviewIcon({
-			svgContent: selectedSvgContent,
-			fill: selectedFill,
-			stroke: selectedStroke,
-			animationType,
-			animationSpeed,
-		});
+		updatePreviewIcon();
 	}
 
 	function handleStrokeChange(event) {
 		selectedStroke = event.target.value;
-		setPreviewIcon({
-			svgContent: selectedSvgContent,
-			fill: selectedFill,
-			stroke: selectedStroke,
-			animationType,
-			animationSpeed,
-		});
+		updatePreviewIcon();
 	}
 
 	function handleAnimationTypeChange(event) {
 		animationType = event.target.value;
-		setPreviewIcon({
-			svgContent: selectedSvgContent,
-			fill: selectedFill,
-			stroke: selectedStroke,
-			animationType,
-			animationSpeed,
-		});
+		updatePreviewIcon();
 	}
 
 	function handleAnimationSpeedChange(event) {
 		animationSpeed = +event.target.value;
+		updatePreviewIcon();
+	}
+
+	function handleDisplayDurationChange(event) {
+		displayDuration = event.target.value;
+		updatePreviewIcon();
+	}
+
+	function updatePreviewIcon() {
+		document.documentElement.style.setProperty('--scale', scaleSize);
+
 		setPreviewIcon({
 			svgContent: selectedSvgContent,
 			fill: selectedFill,
 			stroke: selectedStroke,
 			animationType,
 			animationSpeed,
+			scale: scaleSize,
+			displayDuration: displayDuration,
 		});
 	}
-
 	// Funzione per salvare l'icona personalizzata
 	function saveIcon() {
 		// Qui si salva l'icona nello store principale
@@ -141,6 +135,8 @@
 			stroke: selectedStroke,
 			animationType,
 			animationSpeed,
+			scale: scaleSize,
+			displayDuration: displayDuration,
 		});
 
 		// Resetta tutti gli accordion e i bottoni
@@ -192,6 +188,20 @@
 						</div>
 						{#if selectedIcon}
 							<div class="animationOptions">
+								<p>Personalizza dimensione</p>
+
+								<div class="scale-custom">
+									<label for="scaleIcon">Grandezza:</label>
+									<input
+										type="range"
+										id="scaleIcon"
+										min="0.5"
+										max="2"
+										step="0.1"
+										bind:value={scaleSize}
+										on:input={handleScaleChange} />
+								</div>
+
 								<p>Personalizza colore</p>
 
 								<div class="color-picker-custom">
@@ -241,15 +251,28 @@
 											checked={animationType === 'ping'} />
 										Ping
 									</label>
-									<div>
-										<label for="animationSpeed">Velocità (secondi):</label>
-										<input
-											type="number"
-											id="animationSpeed"
-											min="0.1"
-											step="0.1"
-											bind:value={animationSpeed}
-											on:change={handleAnimationSpeedChange} />
+									<div class="slidersCustomization">
+										<div>
+											<label for="animationSpeed">Velocità (secondi):</label>
+											<input
+												type="number"
+												id="animationSpeed"
+												min="0.1"
+												step="0.1"
+												bind:value={animationSpeed}
+												on:change={handleAnimationSpeedChange} />
+										</div>
+										<div>
+											<label for="animationTime">Tempo visualizzazione:</label>
+											<input
+												type="number"
+												id="animationTime"
+												min="1"
+												max="10"
+												step="1"
+												bind:value={displayDuration}
+												on:input={handleDisplayDurationChange} />
+										</div>
 									</div>
 								</div>
 							</div>
@@ -282,6 +305,20 @@
 						</div>
 						{#if selectedIcon}
 							<div class="animationOptions">
+								<p>Personalizza dimensione</p>
+
+								<div class="scale-custom">
+									<label for="scaleIcon">Grandezza:</label>
+									<input
+										type="range"
+										id="scaleIcon"
+										min="0.5"
+										max="2"
+										step="0.1"
+										bind:value={scaleSize}
+										on:input={handleScaleChange} />
+								</div>
+
 								<p>Personalizza colore</p>
 
 								<div class="color-picker-custom">
@@ -331,15 +368,28 @@
 											checked={animationType === 'ping'} />
 										Ping
 									</label>
-									<div>
-										<label for="animationSpeed">Velocità (secondi):</label>
-										<input
-											type="number"
-											id="animationSpeed"
-											min="0.1"
-											step="0.1"
-											bind:value={animationSpeed}
-											on:change={handleAnimationSpeedChange} />
+									<div class="slidersCustomization">
+										<div>
+											<label for="animationSpeed">Velocità (secondi):</label>
+											<input
+												type="number"
+												id="animationSpeed"
+												min="0.1"
+												step="0.1"
+												bind:value={animationSpeed}
+												on:change={handleAnimationSpeedChange} />
+										</div>
+										<div>
+											<label for="animationTime">Tempo visualizzazione:</label>
+											<input
+												type="number"
+												id="animationTime"
+												min="1"
+												max="10"
+												step="1"
+												bind:value={displayDuration}
+												on:input={handleDisplayDurationChange} />
+										</div>
 									</div>
 								</div>
 							</div>
@@ -370,6 +420,20 @@
 						</div>
 						{#if selectedIcon}
 							<div class="animationOptions">
+								<p>Personalizza dimensione</p>
+
+								<div class="scale-custom">
+									<label for="scaleIcon">Grandezza:</label>
+									<input
+										type="range"
+										id="scaleIcon"
+										min="0.5"
+										max="2"
+										step="0.1"
+										bind:value={scaleSize}
+										on:input={handleScaleChange} />
+								</div>
+
 								<p>Personalizza colore</p>
 
 								<div class="color-picker-custom">
@@ -419,15 +483,28 @@
 											checked={animationType === 'ping'} />
 										Ping
 									</label>
-									<div>
-										<label for="animationSpeed">Velocità (secondi):</label>
-										<input
-											type="number"
-											id="animationSpeed"
-											min="0.1"
-											step="0.1"
-											bind:value={animationSpeed}
-											on:change={handleAnimationSpeedChange} />
+									<div class="slidersCustomization">
+										<div>
+											<label for="animationSpeed">Velocità (secondi):</label>
+											<input
+												type="number"
+												id="animationSpeed"
+												min="0.1"
+												step="0.1"
+												bind:value={animationSpeed}
+												on:change={handleAnimationSpeedChange} />
+										</div>
+										<div>
+											<label for="animationTime">Tempo visualizzazione:</label>
+											<input
+												type="number"
+												id="animationTime"
+												min="1"
+												max="10"
+												step="1"
+												bind:value={displayDuration}
+												on:input={handleDisplayDurationChange} />
+										</div>
 									</div>
 								</div>
 							</div>
@@ -456,6 +533,20 @@
 						</div>
 						{#if selectedIcon}
 							<div class="animationOptions">
+								<p>Personalizza dimensione</p>
+
+								<div class="scale-custom">
+									<label for="scaleIcon">Grandezza:</label>
+									<input
+										type="range"
+										id="scaleIcon"
+										min="0.5"
+										max="2"
+										step="0.1"
+										bind:value={scaleSize}
+										on:input={handleScaleChange} />
+								</div>
+
 								<p>Personalizza colore</p>
 
 								<div class="color-picker-custom">
@@ -505,15 +596,28 @@
 											checked={animationType === 'ping'} />
 										Ping
 									</label>
-									<div>
-										<label for="animationSpeed">Velocità (secondi):</label>
-										<input
-											type="number"
-											id="animationSpeed"
-											min="0.1"
-											step="0.1"
-											bind:value={animationSpeed}
-											on:change={handleAnimationSpeedChange} />
+									<div class="slidersCustomization">
+										<div>
+											<label for="animationSpeed">Velocità (secondi):</label>
+											<input
+												type="number"
+												id="animationSpeed"
+												min="0.1"
+												step="0.1"
+												bind:value={animationSpeed}
+												on:change={handleAnimationSpeedChange} />
+										</div>
+										<div>
+											<label for="animationTime">Tempo visualizzazione:</label>
+											<input
+												type="number"
+												id="animationTime"
+												min="1"
+												max="10"
+												step="1"
+												bind:value={displayDuration}
+												on:input={handleDisplayDurationChange} />
+										</div>
 									</div>
 								</div>
 							</div>
@@ -543,6 +647,20 @@
 						</div>
 						{#if selectedIcon}
 							<div class="animationOptions">
+								<p>Personalizza dimensione</p>
+
+								<div class="scale-custom">
+									<label for="scaleIcon">Grandezza:</label>
+									<input
+										type="range"
+										id="scaleIcon"
+										min="0.5"
+										max="2"
+										step="0.1"
+										bind:value={scaleSize}
+										on:input={handleScaleChange} />
+								</div>
+
 								<p>Personalizza colore</p>
 
 								<div class="color-picker-custom">
@@ -592,15 +710,28 @@
 											checked={animationType === 'ping'} />
 										Ping
 									</label>
-									<div>
-										<label for="animationSpeed">Velocità (secondi):</label>
-										<input
-											type="number"
-											id="animationSpeed"
-											min="0.1"
-											step="0.1"
-											bind:value={animationSpeed}
-											on:change={handleAnimationSpeedChange} />
+									<div class="slidersCustomization">
+										<div>
+											<label for="animationSpeed">Velocità (secondi):</label>
+											<input
+												type="number"
+												id="animationSpeed"
+												min="0.1"
+												step="0.1"
+												bind:value={animationSpeed}
+												on:change={handleAnimationSpeedChange} />
+										</div>
+										<div>
+											<label for="animationTime">Tempo visualizzazione:</label>
+											<input
+												type="number"
+												id="animationTime"
+												min="1"
+												max="10"
+												step="1"
+												bind:value={displayDuration}
+												on:input={handleDisplayDurationChange} />
+										</div>
 									</div>
 								</div>
 							</div>
@@ -617,6 +748,32 @@
 </div>
 
 <style scoped>
+	.scale-custom {
+		display: flex;
+		align-items: center;
+		margin-bottom: 16px;
+	}
+
+	.scale-custom label {
+		margin-right: 16px;
+	}
+	.slidersCustomization {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		margin-top: 12px;
+	}
+
+	.slidersCustomization div {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.slidersCustomization input {
+		width: 20%;
+		padding: 4px;
+	}
 	.backButton {
 		position: absolute;
 		top: 10px;

@@ -11,9 +11,24 @@
 	}
 
 	let selectedIcon = null;
+	let iconTimeout = null;
 
 	$: previewIcon.subscribe((icon) => {
-		selectedIcon = icon;
+		if (icon) {
+			selectedIcon = icon;
+
+			// Cancella il timeout precedente se presente
+			if (iconTimeout) {
+				clearTimeout(iconTimeout);
+			}
+
+			// Imposta un timeout per rimuovere l'icona dopo displayDuration secondi
+			if (icon.displayDuration) {
+				iconTimeout = setTimeout(() => {
+					selectedIcon = null;
+				}, icon.displayDuration * 1000);
+			}
+		}
 	});
 
 	function previewIconHandler(event) {
@@ -232,15 +247,21 @@
 					</div>
 				{/if}
 				{#if selectedIcon}
-					<div
-						class={selectedIcon.animationType || ''}
-						style="animation-duration: {selectedIcon.animationSpeed || 2}s;">
-						{@html selectedIcon.svgContent.replace(
-							'<svg',
-							`
-					<svg fill="${selectedIcon.fill}" stroke="${selectedIcon.stroke}"
-				`
-						)}
+					<div class="flexxo">
+						<div
+							class={selectedIcon.animationType || ''}
+							style="animation-duration: {selectedIcon.animationSpeed || 2}s; 
+		       transform: scale({selectedIcon.scale || 1})">
+							{@html selectedIcon.svgContent.replace(
+								'<svg',
+								`
+		<svg fill="${selectedIcon.fill}" stroke="${selectedIcon.stroke}"
+		`
+							)}
+						</div>
+						{#if selectedIcon.desc}
+							<div>{selectedIcon.desc}</div>
+						{/if}
 					</div>
 				{/if}
 			</div>
@@ -406,5 +427,53 @@
 		100% {
 			opacity: 0;
 		}
+	}
+
+	@keyframes rotateClockwise {
+		from {
+			transform: rotate(0deg) scale(var(--scale, 1));
+		}
+		to {
+			transform: rotate(360deg) scale(var(--scale, 1));
+		}
+	}
+
+	@keyframes rotateAntiClockwise {
+		from {
+			transform: rotate(0deg) scale(var(--scale, 1));
+		}
+		to {
+			transform: rotate(-360deg) scale(var(--scale, 1));
+		}
+	}
+
+	@keyframes ping {
+		0% {
+			transform: scale(calc(var(--scale, 1) * 1));
+		}
+		50% {
+			transform: scale(calc(var(--scale, 1) * 1.2));
+		}
+		100% {
+			transform: scale(calc(var(--scale, 1) * 1));
+		}
+	}
+
+	.rotateClockwise {
+		animation: rotateClockwise linear infinite;
+	}
+
+	.rotateAntiClockwise {
+		animation: rotateAntiClockwise linear infinite;
+	}
+
+	.ping {
+		animation: ping ease-in-out infinite;
+	}
+
+	.flexxo {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 	}
 </style>

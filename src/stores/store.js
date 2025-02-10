@@ -27,7 +27,7 @@ export const savedIcons = writable(loadFromSessionStorage('savedIcons'));
 // Aggiungere un'icona all'array
 export function addSavedIcon(icon) {
 	savedIcons.update((icons) => {
-		const updatedIcons = [...icons, icon];
+		const updatedIcons = [...icons, { ...icon, id: icons.length }]; // Assegna un id univoco
 		saveToSessionStorage('savedIcons', updatedIcons);
 		return updatedIcons;
 	});
@@ -46,6 +46,20 @@ export function updateIconTitle(index, newTitle) {
 export function removeIcon(index) {
 	savedIcons.update((icons) => {
 		const updatedIcons = icons.filter((_, i) => i !== index);
+		saveToSessionStorage('savedIcons', updatedIcons);
+		return updatedIcons;
+	});
+}
+
+// Funzione per aggiornare la descrizione di un'icona
+export function updateIconDescription(iconId, description) {
+	savedIcons.update((icons) => {
+		const updatedIcons = icons.map((icon) => {
+			if (icon.id == iconId) {
+				return { ...icon, desc: description };
+			}
+			return icon;
+		});
 		saveToSessionStorage('savedIcons', updatedIcons);
 		return updatedIcons;
 	});
