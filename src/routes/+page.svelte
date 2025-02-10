@@ -247,7 +247,7 @@
 					</div>
 				{/if}
 				{#if selectedIcon}
-					<div class="flexxo">
+					<div class="flexPreviewBox">
 						<div
 							class={selectedIcon.animationType || ''}
 							style="animation-duration: {selectedIcon.animationSpeed || 2}s; 
@@ -260,7 +260,7 @@
 							)}
 						</div>
 						{#if selectedIcon.desc}
-							<div>{selectedIcon.desc}</div>
+							<div class="descpreview">{selectedIcon.desc}</div>
 						{/if}
 					</div>
 				{/if}
@@ -471,9 +471,13 @@
 		animation: ping ease-in-out infinite;
 	}
 
-	.flexxo {
+	.flexPreviewBox {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+	}
+
+	.descpreview {
+		margin-top: 16px;
 	}
 </style>
