@@ -29,7 +29,7 @@
 		<div class="accordion-item">
 			<div id="feedback_tattile" class="accordion-content">
 				<button class="buttonStyleWide" on:click={toggleVibrazione}>
-					Vibrazione
+					Intensità vibrazione
 					<img src="img/freccia_alto.svg" alt="freccia2" class="button-arrow" />
 				</button>
 
@@ -37,20 +37,20 @@
 					<div id="vibrazione" class="button-content tattile_style">
 						<div class="button-group">
 							<button on:click={() => updateMobilePreview('img/Vibrazione')}>
-								<img src="img/Vibrazione.svg" alt="icon" />
+								<img src="img/icon_intensità_bassa.svg" alt="icon" />
 							</button>
 							<button on:click={() => updateMobilePreview('img/Vibrazione.svg')}>
-								<img src="img/Vibrazione.svg" alt="icon" />
+								<img src="img/icon_intensità_media.svg" alt="icon" />
 							</button>
 							<button on:click={() => updateMobilePreview('img/cerchio_caricamento_linee.svg')}>
-								<img src="img/Vibrazione.svg" alt="icon" />
+								<img src="img/icon_intensità_alta.svg" alt="icon" />
 							</button>
 						</div>
 					</div>
 				{/if}
 
 				<button class="buttonStyleWide" on:click={togglePulsanteSimulato}>
-					Pulsante simulato
+					Intervallo vibrazione
 					<img src="img/freccia_alto.svg" alt="freccia2" class="button-arrow" />
 				</button>
 
@@ -58,13 +58,13 @@
 					<div id="pulsante_simulato" class="button-content tattile_style">
 						<div class="button-group">
 							<button on:click={() => updateMobilePreview('img/Vibrazione.svg')}>
-								<img src="img/Vibrazione.svg" alt="icon" />
+								<img src="img/1_intervallo.svg" alt="icon" />
 							</button>
 							<button on:click={() => updateMobilePreview('img/Vibrazione.svg')}>
-								<img src="img/Vibrazione.svg" alt="icon" />
+								<img src="img/2_intervallo.svg" alt="icon" />
 							</button>
 							<button on:click={() => updateMobilePreview('img/Vibrazione.svg')}>
-								<img src="img/Vibrazione.svg" alt="icon" />
+								<img src="img/3_intervallo.svg" alt="icon" />
 							</button>
 						</div>
 					</div>

@@ -123,6 +123,8 @@
 	let tempTitleEmail, tempDescEmail;
 	let tempTitleSms, tempDescSms;
 
+    
+
 	function toggleDialog(id) {
 		dialogStates = { ...dialogStates, [id]: true };
 
@@ -138,6 +140,7 @@
 		}
 	}
 
+	
 	function closePush() {
 		titlePush = defaultTitlePush;
 		descPush = defaultDescPush;
@@ -208,6 +211,50 @@
 		const notification = $notifications[index];
 		dispatch('showNotification', notification);
 	}
+
+	let showDateTimePicker = false; // Variabile per gestire la visibilità dell'input datetime-local
+    let pushScheduleTime = ''; // Variabile per memorizzare l'ora e il giorno della pianificazione
+
+    function schedulePush() {
+        if (pushScheduleTime) {
+            const newNotification = {
+                type: 'Push',
+                title: tempTitlePush,
+                description: tempDescPush,
+                scheduleTime: pushScheduleTime,
+            };
+            addNotification(newNotification);
+            buttonStates.push = false;
+            showDateTimePicker = false; // Nascondi il datetime picker dopo la pianificazione
+        }
+    }
+
+
+	let isRecording = false;
+    let mediaRecorder;
+    let audioChunks = [];
+
+    async function startRecording() {
+        if (!isRecording) {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.start();
+            mediaRecorder.ondataavailable = (event) => {
+                audioChunks.push(event.data);
+            };
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                audio.play();
+            };
+            isRecording = true;
+        } else {
+            mediaRecorder.stop();
+            isRecording = false;
+        }
+    }
+
 </script>
 
 {#if showFeedbackVisivo}
@@ -300,6 +347,15 @@
 								<label for="pushDesc">Descrizione</label>
 								<input type="text" name="pushDesc" id="pushDesc" bind:value={tempDescPush} />
 							</div>
+							{#if showDateTimePicker}
+							<div class="customizeNotificationStyle">
+								<label for="pushScheduleTime">Data e Ora</label>
+								<input type="datetime-local" name="pushScheduleTime" id="pushScheduleTime" bind:value={pushScheduleTime} />
+							</div>
+							{/if}
+							<div class="pianification-button">
+								<button class="buttonStyle" on:click={() => showDateTimePicker = !showDateTimePicker}>Pianifica notifica</button>
+							</div>
 							<div class="action-buttons">
 								<button class="buttonStyle" on:click={closePush}>Annulla</button>
 								<button class="buttonStyle" on:click={savePush}>Salva</button>
@@ -318,6 +374,9 @@
 								<label for="emailDesc">Descrizione</label>
 								<input type="text" name="emailDesc" id="emailDesc" bind:value={tempDescEmail} />
 							</div>
+							<div class="pianification-button">
+								<button class="buttonStyle">Pianifica notifica</button>
+							</div>
 							<div class="action-buttons">
 								<button class="buttonStyle" on:click={closeEmail}>Annulla</button>
 								<button class="buttonStyle" on:click={saveEmail}>Salva</button>
@@ -335,6 +394,9 @@
 							<div class="customizeNotificationStyle">
 								<label for="smsDesc">Descrizione</label>
 								<input type="text" name="smsDesc" id="smsDesc" bind:value={tempDescSms} />
+							</div>
+							<div class="pianification-button">
+								<button class="buttonStyle">Pianifica notifica</button>
 							</div>
 							<div class="action-buttons">
 								<button class="buttonStyle" on:click={closeSms}>Annulla</button>
@@ -360,8 +422,14 @@
 									<img src="img/volume_high.svg" alt="volume-high" class="volume-icon" />
 								</div>
 							</div>
+							<div class="pianification-button">
+								<button class="buttonStyle">Pianifica notifica</button>
+							</div>
 							<div class="action-buttons">
-								<button class="buttonStyle">Personalizza Suono</button>
+								<button class="buttonStyle" on:click={startRecording}>
+									{#if isRecording} Ferma Registrazione {/if}
+                					{#if !isRecording} Personalizza Suono {/if}
+								</button>
 							</div>
 						</div>
 					{/if}
@@ -535,6 +603,14 @@
 		gap: 12px;
 		margin-top: 10px;
 	}
+
+	.pianification-button {
+		display: flex;
+		justify-content: start;
+		
+	}
+
+
 
 	.buttonStyle {
 		padding: 8px 15px;
