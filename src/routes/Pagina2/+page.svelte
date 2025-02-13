@@ -123,7 +123,10 @@
 	let tempTitleEmail, tempDescEmail;
 	let tempTitleSms, tempDescSms;
 
-    
+	let pushScheduleDate = '';
+	let pushScheduleTime = '';
+
+	let showDateTimePicker = false;
 
 	function toggleDialog(id) {
 		dialogStates = { ...dialogStates, [id]: true };
@@ -140,7 +143,6 @@
 		}
 	}
 
-	
 	function closePush() {
 		titlePush = defaultTitlePush;
 		descPush = defaultDescPush;
@@ -159,14 +161,48 @@
 		dialogStates.sms = false;
 	}
 
+	let showSoundModal = false;
+	let selectedSound = null;
+	let hasSoundTemp = false;
+
+	function openSoundModal() {
+		showSoundModal = true;
+	}
+
+	function closeSoundModal() {
+		showSoundModal = false;
+		selectedSound = null;
+	}
+
+	function confirmSoundSelection() {
+		hasSoundTemp = selectedSound !== null;
+		closeSoundModal();
+	}
+
 	function savePush() {
 		const newNotification = {
 			type: 'Push',
 			title: tempTitlePush,
 			description: tempDescPush,
+			pushScheduleDate: showDateTimePicker ? pushScheduleDate : '',
+			pushScheduleTime: showDateTimePicker ? pushScheduleTime : '',
+			hasSound: hasSoundTemp,
 		};
 		addNotification(newNotification);
 		buttonStates.push = false;
+		clearAll();
+	}
+
+	function clearAll() {
+		tempTitlePush = '';
+		tempDescPush = '';
+		tempTitleEmail = '';
+		tempDescEmail = '';
+		tempTitleSms = '';
+		tempDescSms = '';
+		pushScheduleDate = null;
+		pushScheduleTime = null;
+		hasSound = false;
 	}
 
 	function saveEmail() {
@@ -177,6 +213,7 @@
 		};
 		addNotification(newNotification);
 		buttonStates.email = false;
+		clearAll();
 	}
 
 	function saveSms() {
@@ -187,6 +224,7 @@
 		};
 		addNotification(newNotification);
 		buttonStates.sms = false;
+		clearAll();
 	}
 
 	let buttonStates = {
@@ -212,49 +250,38 @@
 		dispatch('showNotification', notification);
 	}
 
-	let showDateTimePicker = false; // Variabile per gestire la visibilità dell'input datetime-local
-    let pushScheduleTime = ''; // Variabile per memorizzare l'ora e il giorno della pianificazione
-
-    function schedulePush() {
-        if (pushScheduleTime) {
-            const newNotification = {
-                type: 'Push',
-                title: tempTitlePush,
-                description: tempDescPush,
-                scheduleTime: pushScheduleTime,
-            };
-            addNotification(newNotification);
-            buttonStates.push = false;
-            showDateTimePicker = false; // Nascondi il datetime picker dopo la pianificazione
-        }
-    }
-
+	// Variabile per gestire la visibilità dell'input datetime-local
 
 	let isRecording = false;
-    let mediaRecorder;
-    let audioChunks = [];
+	let mediaRecorder;
+	let audioChunks = [];
 
-    async function startRecording() {
-        if (!isRecording) {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
-            mediaRecorder.start();
-            mediaRecorder.ondataavailable = (event) => {
-                audioChunks.push(event.data);
-            };
-            mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                const audioUrl = URL.createObjectURL(audioBlob);
-                const audio = new Audio(audioUrl);
-                audio.play();
-            };
-            isRecording = true;
-        } else {
-            mediaRecorder.stop();
-            isRecording = false;
-        }
-    }
+	async function startRecording() {
+		if (!isRecording) {
+			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+			mediaRecorder = new MediaRecorder(stream);
+			mediaRecorder.start();
+			mediaRecorder.ondataavailable = (event) => {
+				audioChunks.push(event.data);
+			};
+			mediaRecorder.onstop = () => {
+				const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+				const audioUrl = URL.createObjectURL(audioBlob);
+				const audio = new Audio(audioUrl);
+				audio.play();
+			};
+			isRecording = true;
+		} else {
+			mediaRecorder.stop();
+			isRecording = false;
+		}
+	}
 
+	function formatDate(dateString) {
+		if (!dateString) return '';
+		const [year, month, day] = dateString.split('-');
+		return `${day}/${month}/${year}`;
+	}
 </script>
 
 {#if showFeedbackVisivo}
@@ -286,6 +313,40 @@
 		transition:fly={{ x: -600, duration: 300 }}
 		style="position: sticky; top: 0; left: 0; z-index: 100;">
 		<FeedbackTattile on:closeFeedbackTattile={closeFeedbackTattile} />
+	</div>
+{/if}
+
+{#if showSoundModal}
+	<div class="overlay">
+		<div class="modal">
+			<h2>Seleziona il Suono</h2>
+			<div class="icon-grid">
+				{#each ['nota1', 'nota2', 'nota3', 'nota4'] as sound}
+					<div class="icon-item {selectedSound === sound ? 'active' : ''}">
+						<div on:click={() => (selectedSound = sound)}>
+							<img src="img/Nota_musicale.svg" alt="icon" />
+						</div>
+						<div class="volume-control-container" style="margin-left:2px;">
+							<div class="volume-control">
+								<img src="img/volume_low.svg" alt="volume-low" class="volume-icon" />
+								<input
+									type="range"
+									min="0"
+									max="100"
+									value="50"
+									class="slider"
+									id="volume-slider" />
+								<img src="img/volume_high.svg" alt="volume-high" class="volume-icon" />
+							</div>
+						</div>
+					</div>
+				{/each}
+			</div>
+			<div class="modal-actions">
+				<button on:click={confirmSoundSelection}>Salva</button>
+				<button on:click={closeSoundModal}>Annulla</button>
+			</div>
+		</div>
 	</div>
 {/if}
 
@@ -331,8 +392,8 @@
 						<button class="buttonStyleWide" on:click={() => toggleButtonStates('email')}
 							>Email</button>
 						<button class="buttonStyleWide" on:click={() => toggleButtonStates('sms')}>SMS</button>
-						<button class="buttonStyleWide" on:click={() => toggleButtonStates('vocali')}
-							>Vocali</button>
+						<!-- <button class="buttonStyleWide" on:click={() => toggleButtonStates('vocali')}
+							>Vocali</button> -->
 					</div>
 
 					<!-- Personalizzazione per ciascun componente -->
@@ -348,15 +409,34 @@
 								<input type="text" name="pushDesc" id="pushDesc" bind:value={tempDescPush} />
 							</div>
 							{#if showDateTimePicker}
-							<div class="customizeNotificationStyle">
-								<label for="pushScheduleTime">Data e Ora</label>
-								<input type="datetime-local" name="pushScheduleTime" id="pushScheduleTime" bind:value={pushScheduleTime} />
-							</div>
+								<div class="customizeNotificationStyle">
+									<label for="pushScheduleDate">Data</label>
+									<input
+										class="customW"
+										type="date"
+										name="pushScheduleDate"
+										id="pushScheduleDate"
+										bind:value={pushScheduleDate} />
+								</div>
+								<div class="customizeNotificationStyle">
+									<label for="pushScheduleTime">Ora</label>
+									<input
+										class="customW"
+										type="Time"
+										name="pushScheduleTime"
+										id="pushScheduleTime"
+										bind:value={pushScheduleTime} />
+								</div>
 							{/if}
-							<div class="pianification-button">
-								<button class="buttonStyle" on:click={() => showDateTimePicker = !showDateTimePicker}>Pianifica notifica</button>
-							</div>
 							<div class="action-buttons">
+								<button
+									class="buttonStylePlanning"
+									on:click={() => (showDateTimePicker = !showDateTimePicker)}
+									>Pianifica notifica
+								</button>
+
+								<button class="buttonStyle" on:click={openSoundModal}> Personalizza Suono </button>
+
 								<button class="buttonStyle" on:click={closePush}>Annulla</button>
 								<button class="buttonStyle" on:click={savePush}>Salva</button>
 							</div>
@@ -374,10 +454,32 @@
 								<label for="emailDesc">Descrizione</label>
 								<input type="text" name="emailDesc" id="emailDesc" bind:value={tempDescEmail} />
 							</div>
-							<div class="pianification-button">
-								<button class="buttonStyle">Pianifica notifica</button>
-							</div>
+							{#if showDateTimePicker}
+								<div class="customizeNotificationStyle">
+									<label for="pushScheduleDate">Data</label>
+									<input
+										class="customW"
+										type="date"
+										name="pushScheduleDate"
+										id="pushScheduleDate"
+										bind:value={pushScheduleDate} />
+								</div>
+								<div class="customizeNotificationStyle">
+									<label for="pushScheduleTime">Ora</label>
+									<input
+										class="customW"
+										type="Time"
+										name="pushScheduleTime"
+										id="pushScheduleTime"
+										bind:value={pushScheduleTime} />
+								</div>
+							{/if}
 							<div class="action-buttons">
+								<button
+									class="buttonStylePlanning"
+									on:click={() => (showDateTimePicker = !showDateTimePicker)}
+									>Pianifica notifica
+								</button>
 								<button class="buttonStyle" on:click={closeEmail}>Annulla</button>
 								<button class="buttonStyle" on:click={saveEmail}>Salva</button>
 							</div>
@@ -395,17 +497,39 @@
 								<label for="smsDesc">Descrizione</label>
 								<input type="text" name="smsDesc" id="smsDesc" bind:value={tempDescSms} />
 							</div>
-							<div class="pianification-button">
-								<button class="buttonStyle">Pianifica notifica</button>
-							</div>
+							{#if showDateTimePicker}
+								<div class="customizeNotificationStyle">
+									<label for="pushScheduleDate">Data</label>
+									<input
+										class="customW"
+										type="date"
+										name="pushScheduleDate"
+										id="pushScheduleDate"
+										bind:value={pushScheduleDate} />
+								</div>
+								<div class="customizeNotificationStyle">
+									<label for="pushScheduleTime">Ora</label>
+									<input
+										class="customW"
+										type="Time"
+										name="pushScheduleTime"
+										id="pushScheduleTime"
+										bind:value={pushScheduleTime} />
+								</div>
+							{/if}
 							<div class="action-buttons">
+								<button
+									class="buttonStylePlanning"
+									on:click={() => (showDateTimePicker = !showDateTimePicker)}
+									>Pianifica notifica
+								</button>
 								<button class="buttonStyle" on:click={closeSms}>Annulla</button>
 								<button class="buttonStyle" on:click={saveSms}>Salva</button>
 							</div>
 						</div>
 					{/if}
 
-					{#if buttonStates.vocali}
+					<!-- {#if buttonStates.vocali}
 						<div class="customization-panel">
 							<p>Personalizzazione Notifica Vocale</p>
 							<div class="customizeNotificationStyle">
@@ -421,18 +545,36 @@
 										id="volume-slider" />
 									<img src="img/volume_high.svg" alt="volume-high" class="volume-icon" />
 								</div>
-							</div>
-							<div class="pianification-button">
-								<button class="buttonStyle">Pianifica notifica</button>
+								{#if showDateTimePicker}
+									<div class="customizeNotificationStyle">
+										<label for="pushScheduleDate">Data</label>
+										<input
+											class="customW"
+											type="date"
+											name="pushScheduleDate"
+											id="pushScheduleDate"
+											bind:value={pushScheduleDate} />
+									</div>
+									<div class="customizeNotificationStyle">
+										<label for="pushScheduleTime">Ora</label>
+										<input
+											class="customW"
+											type="Time"
+											name="pushScheduleTime"
+											id="pushScheduleTime"
+											bind:value={pushScheduleTime} />
+									</div>
+								{/if}
 							</div>
 							<div class="action-buttons">
-								<button class="buttonStyle" on:click={startRecording}>
-									{#if isRecording} Ferma Registrazione {/if}
-                					{#if !isRecording} Personalizza Suono {/if}
+								<button
+									class="buttonStylePlanning"
+									on:click={() => (showDateTimePicker = !showDateTimePicker)}
+									>Pianifica notifica
 								</button>
 							</div>
 						</div>
-					{/if}
+					{/if} -->
 				</div>
 			{/if}
 		</div>
@@ -462,11 +604,18 @@
 								</div>
 
 								<!-- Se l'icona è in modalità modifica, mostriamo un input -->
-								{#if editingIndex === index}
-									<input type="text" bind:value={newTitle} class="rename-input" />
-								{:else}
-									<p>{icon.title}</p>
-								{/if}
+								<div>
+									{#if editingIndex === index}
+										<input type="text" bind:value={newTitle} class="rename-input" />
+									{:else}
+										<p class="titleIconPrev">{icon.title}</p>
+									{/if}
+									<p
+										class="descIconPrev"
+										style="color: {icon.desc.color}; font-weight: {icon.desc.weight}">
+										{icon.desc.text}
+									</p>
+								</div>
 							</div>
 							<div class="saved-icon-item-action">
 								{#if editingIndex === index}
@@ -482,7 +631,6 @@
 					<h3 class="h3-notification">Notifiche Salvate</h3>
 					{#each $notifications as notification, index}
 						<div class="saved-notification">
-							<div class="type-notification">{notification.type}</div>
 							<div class="notificationBox">
 								<div>
 									<img src="img/Account.png" alt="" />
@@ -492,6 +640,18 @@
 									<p class="descNotificationBoxContent">{notification.description}</p>
 								</div>
 							</div>
+							<div class="type-notificationAlt">
+								{#if notification.pushScheduleDate && notification.pushScheduleTime}
+									<span style="font-weight: 600; padding-right: 12px">
+										{formatDate(notification.pushScheduleDate)} - {notification.pushScheduleTime}
+									</span>
+								{/if}
+								{notification.type}
+								{#if notification.hasSound}
+									🎵
+								{/if}
+							</div>
+
 							<div class="action-buttons">
 								<button class="buttonStyle" on:click={() => previewNotification(index)}>
 									Anteprima
@@ -546,6 +706,15 @@
 	}
 
 	.type-notification {
+		position: absolute;
+		top: 4px;
+		left: 8px;
+		font-size: 12px;
+		font-weight: 600;
+		font-style: italic;
+	}
+
+	.type-notificationAlt {
 		position: absolute;
 		top: 4px;
 		right: 8px;
@@ -604,14 +773,6 @@
 		margin-top: 10px;
 	}
 
-	.pianification-button {
-		display: flex;
-		justify-content: start;
-		
-	}
-
-
-
 	.buttonStyle {
 		padding: 8px 15px;
 	}
@@ -636,6 +797,7 @@
 		display: flex;
 		gap: 4px;
 		justify-content: end;
+		margin-top: 8px;
 	}
 
 	.saved-icon-item-action button {
@@ -821,5 +983,81 @@
 
 	#i_miei_feedback_notifiche {
 		margin-bottom: 54px;
+	}
+
+	.customW {
+		width: 165px;
+	}
+
+	.buttonStylePlanning {
+		margin-right: auto;
+		padding: 2px 8px;
+	}
+
+	.titleIconPrev {
+		font-weight: 600;
+		font-size: 14px;
+		padding-bottom: 8px;
+	}
+
+	.descIconPrev {
+		font-weight: 400;
+		font-size: 12px;
+	}
+
+	.overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0, 0, 0, 0.5);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 1000;
+	}
+
+	.modal {
+		background: white;
+		padding: 20px;
+		border-radius: 12px;
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+		text-align: center;
+	}
+
+	.icon-grid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 16px;
+		margin: 20px 0;
+	}
+
+	.icon-item {
+		cursor: pointer;
+		padding: 10px;
+		border: 2px solid transparent;
+		border-radius: 8px;
+		transition: all 0.3s;
+	}
+
+	.icon-item:hover {
+		border-color: #007bff;
+	}
+
+	.icon-item.active {
+		border-color: #007bff;
+	}
+
+	.modal-actions {
+		display: flex;
+		justify-content: center;
+		gap: 16px;
+	}
+
+	.modal-actions button {
+		padding: 8px 16px;
+		border-radius: 6px;
+		cursor: pointer;
 	}
 </style>

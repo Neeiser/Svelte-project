@@ -25,11 +25,15 @@
 }
 
 * {
-    font-family: Raleway !important;
+    font-family: Raleway;
     font-weight: 500;
     margin: 0;
     box-sizing: border-box;
     padding: 0;
+}
+
+h1{
+    font-family: Oswald !important;
 }
 
 body{

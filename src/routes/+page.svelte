@@ -260,7 +260,11 @@
 							)}
 						</div>
 						{#if selectedIcon.desc}
-							<div class="descpreview">{selectedIcon.desc}</div>
+							<div
+								class="descpreview"
+								style="color: {selectedIcon.desc.color}; font-weight: {selectedIcon.desc.weight}">
+								{selectedIcon.desc.text}
+							</div>
 						{/if}
 					</div>
 				{/if}
@@ -478,6 +482,7 @@
 	}
 
 	.descpreview {
+		text-align: center;
 		margin-top: 16px;
 	}
 </style>

@@ -1,6 +1,22 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
+	import { savedIcons, updateIconDescription } from '../../stores/store';
+	let showModal = false;
+	let selectedIconId = null;
+
+	function openModal() {
+		showModal = true;
+	}
+
+	function closeModal() {
+		showModal = false;
+	}
+
+	let icons = [];
+	savedIcons.subscribe((value) => {
+		icons = value;
+	});
 
 	let accordionStates = {
 		suonoConferma: false,
@@ -10,11 +26,49 @@
 	};
 
 	function toggleAccordion(id) {
-		accordionStates[id] = !accordionStates[id];
+		if (accordionStates[id]) {
+			accordionStates[id] = false;
+		} else {
+			Object.keys(accordionStates).forEach((key) => {
+				accordionStates[key] = false;
+			});
+			accordionStates[id] = true;
+		}
 	}
 </script>
 
 <div class="leftShoulder">
+	{#if showModal}
+		<div class="overlay">
+			<div class="modal">
+				<h2>Seleziona un'icona</h2>
+				<div class="icon-grid">
+					{#each icons as icon}
+						<div
+							class="icon-item {selectedIconId === icon.id ? 'active' : ''}"
+							on:click={() => (selectedIconId = icon.id)}>
+							<div
+								class={icon.animationType || ''}
+								style="animation-duration: {icon.animationSpeed || 2}s; 
+		   transform: scale({icon.scale || 1})">
+								{@html icon.svgContent.replace(
+									'<svg',
+									`
+	<svg fill="${icon.fill}" stroke="${icon.stroke}"
+	`
+								)}
+							</div>
+							<p>{icon.title}</p>
+						</div>
+					{/each}
+				</div>
+				<div class="modal-actions">
+					<button on:click={closeModal}>Salva</button>
+					<button on:click={closeModal}>Annulla</button>
+				</div>
+			</div>
+		</div>
+	{/if}
 	<h2 class="backButton" on:click={() => dispatch('closeFeedbackSonoro')}>
 		<img src="img/freccia_sinistra.svg" class="accordion-arrow" />Back
 	</h2>
@@ -34,7 +88,7 @@
 					<div id="suono_conferma" class="button-content suono_style">
 						<div class="button-group">
 							<div class="button-container2">
-								<button on:click={() => updateMobilePreview('img/Nota_musicale.svg')}>
+								<button on:click={() => openModal()}>
 									<img src="img/Nota_musicale.svg" alt="icon" />
 								</button>
 								<div class="volume-control-container" style="margin-left:2px;">
@@ -53,7 +107,7 @@
 							</div>
 
 							<div class="button-container2">
-								<button on:click={() => updateMobilePreview('img/Nota_musicale.svg')}>
+								<button on:click={() => openModal()}>
 									<img src="img/Nota_musicale.svg" alt="icon" />
 								</button>
 								<div class="volume-control-container" style="margin-left: 2px;">
@@ -72,7 +126,7 @@
 							</div>
 
 							<div class="button-container2">
-								<button on:click={() => updateMobilePreview('img/Nota_musicale.svg')}>
+								<button on:click={() => openModal()}>
 									<img src="img/Nota_musicale.svg" alt="icon" />
 								</button>
 								<div class="volume-control-container" style="margin-left: 2px;">
@@ -94,7 +148,6 @@
 						<div
 							class="button-container-btn-other"
 							style=" justify-content: center; margin-left: 40px;">
-							<button class="other-btn">Altre opzioni</button>
 						</div>
 					</div>
 				{/if}
@@ -135,7 +188,7 @@
 					<div id="suono_errore" class="button-content suono_style">
 						<div class="button-group">
 							<div class="button-container2">
-								<button on:click={() => updateMobilePreview('img/Nota_musicale.svg')}>
+								<button on:click={() => openModal()}>
 									<img src="img/Nota_musicale.svg" alt="icon" />
 								</button>
 								<div class="volume-control-container" style="margin-left:2px;">
@@ -154,7 +207,7 @@
 							</div>
 
 							<div class="button-container2">
-								<button on:click={() => updateMobilePreview('img/Nota_musicale.svg')}>
+								<button on:click={() => openModal()}>
 									<img src="img/Nota_musicale.svg" alt="icon" />
 								</button>
 								<div class="volume-control-container" style="margin-left:2px;">
@@ -173,7 +226,7 @@
 							</div>
 
 							<div class="button-container2">
-								<button on:click={() => updateMobilePreview('img/Nota_musicale.svg')}>
+								<button on:click={() => openModal()}>
 									<img src="img/Nota_musicale.svg" alt="icon" />
 								</button>
 								<div class="volume-control-container" style="margin-left:2px;">
@@ -194,7 +247,6 @@
 						<div
 							class="button-container-btn-other"
 							style=" justify-content: center; margin-left: 40px;">
-							<button class="other-btn">Altre opzioni</button>
 						</div>
 					</div>
 				{/if}
@@ -234,7 +286,7 @@
 					<div id="suono_notifica" class="button-content suono_style">
 						<div class="button-group">
 							<div class="button-container2">
-								<button on:click={() => updateMobilePreview('img/Nota_musicale.svg')}>
+								<button on:click={() => openModal()}>
 									<img src="img/Nota_musicale.svg" alt="icon" />
 								</button>
 								<div class="volume-control-container" style="margin-left:2px;">
@@ -253,7 +305,7 @@
 							</div>
 
 							<div class="button-container2">
-								<button on:click={() => updateMobilePreview('img/Nota_musicale.svg')}>
+								<button on:click={() => openModal()}>
 									<img src="img/Nota_musicale.svg" alt="icon" />
 								</button>
 								<div class="volume-control-container" style="margin-left:2px;">
@@ -272,7 +324,7 @@
 							</div>
 
 							<div class="button-container2">
-								<button on:click={() => updateMobilePreview('img/Nota_musicale.svg')}>
+								<button on:click={() => openModal()}>
 									<img src="img/Nota_musicale.svg" alt="icon" />
 								</button>
 								<div class="volume-control-container" style="margin-left:2px;">
@@ -293,7 +345,6 @@
 						<div
 							class="button-container-btn-other"
 							style=" justify-content: center; margin-left: 40px;">
-							<button class="other-btn">Altre opzioni</button>
 						</div>
 					</div>
 				{/if}
@@ -333,7 +384,7 @@
 					<div id="suono_avviso" class="button-content suono_style">
 						<div class="button-group">
 							<div class="button-container2">
-								<button on:click={() => updateMobilePreview('img/Nota_musicale.svg')}>
+								<button on:click={() => openModal()}>
 									<img src="img/Nota_musicale.svg" alt="icon" />
 								</button>
 								<div class="volume-control-container" style="margin-left:2px;">
@@ -352,7 +403,7 @@
 							</div>
 
 							<div class="button-container2">
-								<button on:click={() => updateMobilePreview('img/Nota_musicale.svg')}>
+								<button on:click={() => openModal()}>
 									<img src="img/Nota_musicale.svg" alt="icon" />
 								</button>
 								<div class="volume-control-container" style="margin-left:2px;">
@@ -371,7 +422,7 @@
 							</div>
 
 							<div class="button-container2">
-								<button on:click={() => updateMobilePreview('img/Nota_musicale.svg')}>
+								<button on:click={() => openModal()}>
 									<img src="img/Nota_musicale.svg" alt="icon" />
 								</button>
 								<div class="volume-control-container" style="margin-left:2px;">
@@ -392,7 +443,6 @@
 						<div
 							class="button-container-btn-other"
 							style=" justify-content: center; margin-left: 40px;">
-							<button class="other-btn">Altre opzioni</button>
 						</div>
 					</div>
 				{/if}
@@ -464,5 +514,61 @@
 		align-items: center;
 		gap: 8px;
 		padding: 12px 0px;
+	}
+
+	.overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0, 0, 0, 0.5);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 1000;
+	}
+
+	.modal {
+		background: white;
+		padding: 20px;
+		border-radius: 12px;
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+		text-align: center;
+	}
+
+	.icon-grid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 16px;
+		margin: 20px 0;
+	}
+
+	.icon-item {
+		cursor: pointer;
+		padding: 10px;
+		border: 2px solid transparent;
+		border-radius: 8px;
+		transition: all 0.3s;
+	}
+
+	.icon-item:hover {
+		border-color: #007bff;
+	}
+
+	.icon-item.active {
+		border-color: #007bff;
+	}
+
+	.modal-actions {
+		display: flex;
+		justify-content: center;
+		gap: 16px;
+	}
+
+	.modal-actions button {
+		padding: 8px 16px;
+		border-radius: 6px;
+		cursor: pointer;
 	}
 </style>
