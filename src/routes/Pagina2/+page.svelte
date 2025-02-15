@@ -610,11 +610,13 @@
 									{:else}
 										<p class="titleIconPrev">{icon.title}</p>
 									{/if}
-									<p
-										class="descIconPrev"
-										style="color: {icon.desc.color}; font-weight: {icon.desc.weight}">
-										{icon.desc.text}
-									</p>
+									{#if icon.desc}
+										<p
+											class="descIconPrev"
+											style="color: {icon.desc.color}; font-weight: {icon.desc.weight}">
+											{icon.desc.text}
+										</p>
+									{/if}
 								</div>
 							</div>
 							<div class="saved-icon-item-action">
