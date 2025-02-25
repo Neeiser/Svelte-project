@@ -188,6 +188,10 @@
 						</div>
 						{#if selectedIcon}
 							<div class="animationOptions">
+								
+								<p>Rinomina feedback</p>
+								<input type="text" placeholder="Inserisci il nome" />
+								
 								<p>Personalizza dimensione</p>
 
 								<div class="scale-custom">
@@ -305,6 +309,10 @@
 						</div>
 						{#if selectedIcon}
 							<div class="animationOptions">
+								
+								<p>Rinomina feedback</p>
+								<input type="text" placeholder="Inserisci il nome" />
+								
 								<p>Personalizza dimensione</p>
 
 								<div class="scale-custom">
@@ -420,6 +428,10 @@
 						</div>
 						{#if selectedIcon}
 							<div class="animationOptions">
+								<p>Rinomina feedback</p>
+								<input type="text" placeholder="Inserisci il nome" />
+								
+								
 								<p>Personalizza dimensione</p>
 
 								<div class="scale-custom">
@@ -533,6 +545,11 @@
 						</div>
 						{#if selectedIcon}
 							<div class="animationOptions">
+								
+								<p>Rinomina feedback</p>
+								<input type="text" placeholder="Inserisci il nome" />
+								
+								
 								<p>Personalizza dimensione</p>
 
 								<div class="scale-custom">
@@ -647,6 +664,10 @@
 						</div>
 						{#if selectedIcon}
 							<div class="animationOptions">
+								
+								<p>Rinomina feedback</p>
+								<input type="text" placeholder="Inserisci il nome" />
+								
 								<p>Personalizza dimensione</p>
 
 								<div class="scale-custom">
@@ -833,6 +854,16 @@
 		font-size: 18px;
 		margin-bottom: 16px;
 	}
+
+	.animationOptions input[type="text"] {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
 
 	.color-picker-custom {
 		display: flex;

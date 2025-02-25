@@ -82,7 +82,7 @@
 
 				{#if showVibrazione}
 					<div id="vibrazione" class="button-content tattile_style">
-						<div class="button-group">
+						<div class="button-group" style="gap: 20px; background-color: #FFFDFE;">
 							<button on:click={() => openModal()}>
 								<img src="img/icon_intensità_bassa.svg" alt="icon" />
 							</button>
@@ -103,7 +103,7 @@
 
 				{#if showPulsanteSimulato}
 					<div id="pulsante_simulato" class="button-content tattile_style">
-						<div class="button-group">
+						<div class="button-group" style="gap: 20px;">
 							<button on:click={() => openModal()}>
 								<img src="img/1_intervallo.svg" alt="icon" />
 							</button>
@@ -215,4 +215,6 @@
 		border-radius: 6px;
 		cursor: pointer;
 	}
+	
+	
 </style>

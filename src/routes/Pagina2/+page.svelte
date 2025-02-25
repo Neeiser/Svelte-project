@@ -108,20 +108,23 @@
 	let defaultDescPush = 'Lorem ipsum dolor sit amet..';
 	let titlePush = defaultTitlePush;
 	let descPush = defaultDescPush;
+	
 
 	let defaultTitleEmail = 'Your message!';
 	let defaultDescEmail = 'Lorem ipsum dolor sit amet..';
 	let titleEmail = defaultTitleEmail;
 	let descEmail = defaultDescEmail;
+	
 
 	let defaultTitleSms = 'Your message!';
 	let defaultDescSms = 'Lorem ipsum dolor sit amet..';
 	let titleSms = defaultTitleSms;
 	let descSms = defaultDescSms;
 
-	let tempTitlePush, tempDescPush;
-	let tempTitleEmail, tempDescEmail;
-	let tempTitleSms, tempDescSms;
+	let tempTitlePush, tempDescPush, tempLinkPush;
+	let tempTitleEmail, tempDescEmail, tempLinkEmail;
+	let tempTitleSms, tempDescSms, tempLinkSms;
+
 
 	let pushScheduleDate = '';
 	let pushScheduleTime = '';
@@ -405,9 +408,14 @@
 								<input type="text" name="pushTitle" id="pushTitle" bind:value={tempTitlePush} />
 							</div>
 							<div class="customizeNotificationStyle">
-								<label for="pushDesc">Descrizione</label>
-								<input type="text" name="pushDesc" id="pushDesc" bind:value={tempDescPush} />
+								<label for="pushDesc">Messaggio</label>
+								<input type="text" name="pushDesc" style="height: 40px;" id="pushDesc" bind:value={tempDescPush} />
 							</div>
+							<div class="customizeNotificationLink">
+								<label for="pushLink">Inserisci un link al messaggio</label>
+								<input type="text" name="pushLink" id="pushLink" bind:value={tempLinkPush} />
+							</div>	
+						
 							{#if showDateTimePicker}
 								<div class="customizeNotificationStyle">
 									<label for="pushScheduleDate">Data</label>
@@ -438,7 +446,7 @@
 								<button class="buttonStyle" on:click={openSoundModal}> Personalizza Suono </button>
 
 								<button class="buttonStyle" on:click={closePush}>Annulla</button>
-								<button class="buttonStyle" on:click={savePush}>Salva</button>
+								<button class="buttonStyle" style="background-color:#9F1349; color:#FFFDFE;border:none"  on:click={savePush}>Salva</button>
 							</div>
 						</div>
 					{/if}
@@ -451,9 +459,13 @@
 								<input type="text" name="emailTitle" id="emailTitle" bind:value={tempTitleEmail} />
 							</div>
 							<div class="customizeNotificationStyle">
-								<label for="emailDesc">Descrizione</label>
-								<input type="text" name="emailDesc" id="emailDesc" bind:value={tempDescEmail} />
+								<label for="emailDesc">Messaggio</label>
+								<input type="text" name="emailDesc"  style="height: 40px;" id="emailDesc" bind:value={tempDescEmail} />
 							</div>
+							<div class="customizeNotificationLink">
+								<label for="emailLink">Inserisci un link al messaggio</label>
+								<input type="text" name="emailLink" id="emailLink" bind:value={tempLinkEmail} />
+							</div>	
 							{#if showDateTimePicker}
 								<div class="customizeNotificationStyle">
 									<label for="pushScheduleDate">Data</label>
@@ -481,7 +493,7 @@
 									>Pianifica notifica
 								</button>
 								<button class="buttonStyle" on:click={closeEmail}>Annulla</button>
-								<button class="buttonStyle" on:click={saveEmail}>Salva</button>
+								<button class="buttonStyle" style="background-color:#9F1349; color:#FFFDFE; border:none"  on:click={saveEmail}>Salva</button>
 							</div>
 						</div>
 					{/if}
@@ -494,9 +506,14 @@
 								<input type="text" name="smsTitle" id="smsTitle" bind:value={tempTitleSms} />
 							</div>
 							<div class="customizeNotificationStyle">
-								<label for="smsDesc">Descrizione</label>
-								<input type="text" name="smsDesc" id="smsDesc" bind:value={tempDescSms} />
+								<label for="smsDesc">Messaggio</label>
+								<input type="text" name="smsDesc" style="height: 40px;" id="smsDesc" bind:value={tempDescSms} />
 							</div>
+				
+							<div class="customizeNotificationLink">
+								<label for="smsLink">Inserisci un link al messaggio</label>
+								<input type="text" name="smsLink" id="smsLink" bind:value={tempLinkSms} />
+							</div>		
 							{#if showDateTimePicker}
 								<div class="customizeNotificationStyle">
 									<label for="pushScheduleDate">Data</label>
@@ -524,7 +541,7 @@
 									>Pianifica notifica
 								</button>
 								<button class="buttonStyle" on:click={closeSms}>Annulla</button>
-								<button class="buttonStyle" on:click={saveSms}>Salva</button>
+								<button class="buttonStyle" style="background-color: #9F1349; color:#FFFDFE; border:none" on:click={saveSms}>Salva</button>
 							</div>
 						</div>
 					{/if}
@@ -734,14 +751,35 @@
 	.customizeNotificationStyle label {
 		font-size: 12px;
 		font-weight: 600;
+		
 	}
 
 	.customizeNotificationStyle input {
 		padding: 4px;
+		border-radius: 7px;
+		border: #949494 1px solid;
 	}
 	.customization-container {
 		margin-top: 20px;
 	}
+
+	.customizeNotificationLink {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 6px;
+	}
+	.customizeNotificationLink label {
+		font-size: 12px;
+		font-weight: 600;
+	}
+
+	.customizeNotificationLink input {
+		padding: 4px;
+		border-radius: 7px;
+		border: #949494 1px solid;
+	}
+
 
 	.button-group {
 		display: flex;

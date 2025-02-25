@@ -485,4 +485,6 @@
 		text-align: center;
 		margin-top: 16px;
 	}
+
+	
 </style>

@@ -488,6 +488,10 @@
 
 	.btn-save {
 		padding: 8px;
+		background-color: #9F1349;
+		color: #FFFDFE;
+		border: none;
+		border-radius: 7px;
 	}
 
 	.messaggi_style {
