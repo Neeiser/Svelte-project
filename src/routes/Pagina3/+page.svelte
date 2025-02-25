@@ -51,6 +51,7 @@
 		showPopup = false;
 	}
 
+	let titleIcon = '';
 	let selectedIcon = '';
 	let selectedSvgContent = '';
 	let selectedStroke = '#000000';
@@ -129,7 +130,7 @@
 	function saveIcon() {
 		// Qui si salva l'icona nello store principale
 		addSavedIcon({
-			title: 'Titolo default',
+			title: titleIcon,
 			svgContent: selectedSvgContent,
 			fill: selectedFill,
 			stroke: selectedStroke,
@@ -146,6 +147,8 @@
 		Object.keys(buttonStates).forEach((key) => {
 			buttonStates[key] = false;
 		});
+
+		titleIcon = '';
 
 		// Una volta salvata l'icona, rimuoviamo l'anteprima
 		clearPreviewIcon();
@@ -188,10 +191,9 @@
 						</div>
 						{#if selectedIcon}
 							<div class="animationOptions">
-								
 								<p>Rinomina feedback</p>
-								<input type="text" placeholder="Inserisci il nome" />
-								
+								<input type="text" placeholder="Inserisci il nome" bind:value={titleIcon} />
+
 								<p>Personalizza dimensione</p>
 
 								<div class="scale-custom">
@@ -282,7 +284,8 @@
 							</div>
 
 							<!-- Pulsante per salvare l'icona -->
-							<button class="buttonStyleWide" on:click={saveIcon}>Salva Icona</button>
+							<button class="buttonStyleWide saveButtonColor" on:click={saveIcon}
+								>Salva Icona</button>
 						{/if}
 					</div>
 				{/if}
@@ -309,10 +312,9 @@
 						</div>
 						{#if selectedIcon}
 							<div class="animationOptions">
-								
 								<p>Rinomina feedback</p>
-								<input type="text" placeholder="Inserisci il nome" />
-								
+								<input type="text" placeholder="Inserisci il nome" bind:value={titleIcon} />
+
 								<p>Personalizza dimensione</p>
 
 								<div class="scale-custom">
@@ -403,7 +405,8 @@
 							</div>
 
 							<!-- Pulsante per salvare l'icona -->
-							<button class="buttonStyleWide" on:click={saveIcon}>Salva Icona</button>
+							<button class="buttonStyleWide saveButtonColor" on:click={saveIcon}
+								>Salva Icona</button>
 						{/if}
 					</div>
 				{/if}
@@ -429,9 +432,8 @@
 						{#if selectedIcon}
 							<div class="animationOptions">
 								<p>Rinomina feedback</p>
-								<input type="text" placeholder="Inserisci il nome" />
-								
-								
+								<input type="text" placeholder="Inserisci il nome" bind:value={titleIcon} />
+
 								<p>Personalizza dimensione</p>
 
 								<div class="scale-custom">
@@ -522,7 +524,8 @@
 							</div>
 
 							<!-- Pulsante per salvare l'icona -->
-							<button class="buttonStyleWide" on:click={saveIcon}>Salva Icona</button>
+							<button class="buttonStyleWide saveButtonColor" on:click={saveIcon}
+								>Salva Icona</button>
 						{/if}
 					</div>
 				{/if}
@@ -545,11 +548,9 @@
 						</div>
 						{#if selectedIcon}
 							<div class="animationOptions">
-								
 								<p>Rinomina feedback</p>
-								<input type="text" placeholder="Inserisci il nome" />
-								
-								
+								<input type="text" placeholder="Inserisci il nome" bind:value={titleIcon} />
+
 								<p>Personalizza dimensione</p>
 
 								<div class="scale-custom">
@@ -640,7 +641,8 @@
 							</div>
 
 							<!-- Pulsante per salvare l'icona -->
-							<button class="buttonStyleWide" on:click={saveIcon}>Salva Icona</button>
+							<button class="buttonStyleWide saveButtonColor" on:click={saveIcon}
+								>Salva Icona</button>
 						{/if}
 					</div>
 				{/if}
@@ -664,10 +666,9 @@
 						</div>
 						{#if selectedIcon}
 							<div class="animationOptions">
-								
 								<p>Rinomina feedback</p>
-								<input type="text" placeholder="Inserisci il nome" />
-								
+								<input type="text" placeholder="Inserisci il nome" bind:value={titleIcon} />
+
 								<p>Personalizza dimensione</p>
 
 								<div class="scale-custom">
@@ -758,7 +759,8 @@
 							</div>
 
 							<!-- Pulsante per salvare l'icona -->
-							<button class="buttonStyleWide" on:click={saveIcon}>Salva Icona</button>
+							<button class="buttonStyleWide saveButtonColor" on:click={saveIcon}
+								>Salva Icona</button>
 						{/if}
 					</div>
 				{/if}
@@ -855,15 +857,20 @@
 		margin-bottom: 16px;
 	}
 
-	.animationOptions input[type="text"] {
-        width: 100%;
-        padding: 8px;
-        margin-bottom: 16px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 14px;
-    }
+	.animationOptions input[type='text'] {
+		width: 100%;
+		padding: 8px;
+		margin-bottom: 16px;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+		font-size: 14px;
+	}
 
+	.saveButtonColor {
+		background-color: #9f1349;
+		color: #fffdfe;
+		border: none;
+	}
 
 	.color-picker-custom {
 		display: flex;

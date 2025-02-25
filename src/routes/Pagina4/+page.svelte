@@ -219,7 +219,7 @@
 						<ul>
 							{#each $messages.errore as message, index}
 								<li>
-									<span class="padding-right-mess">{message}</span>
+									<span class="padding-right-mess">{message.text}</span>
 									<button class="btn-combine" on:click={() => openCombine(message)}>Combina</button>
 									<button class="delete-btn" on:click={() => removeMessage('errore', index)}
 										>❌</button>
@@ -282,7 +282,7 @@
 						<ul>
 							{#each $messages.attesa as message, index}
 								<li>
-									<span class="padding-right-mess">{message}</span>
+									<span class="padding-right-mess">{message.text}</span>
 									<button class="btn-combine" on:click={() => openCombine(message)}>Combina</button>
 									<button class="delete-btn" on:click={() => removeMessage('attesa', index)}
 										>❌</button>
@@ -345,7 +345,7 @@
 						<ul>
 							{#each $messages.supporto as message, index}
 								<li>
-									<span class="padding-right-mess">{message}</span>
+									<span class="padding-right-mess">{message.text}</span>
 									<button class="btn-combine" on:click={() => openCombine(message)}>Combina</button>
 									<button class="delete-btn" on:click={() => removeMessage('supporto', index)}
 										>❌</button>
@@ -488,8 +488,8 @@
 
 	.btn-save {
 		padding: 8px;
-		background-color: #9F1349;
-		color: #FFFDFE;
+		background-color: #9f1349;
+		color: #fffdfe;
 		border: none;
 		border-radius: 7px;
 	}
