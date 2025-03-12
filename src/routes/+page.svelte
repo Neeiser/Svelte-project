@@ -13,6 +13,12 @@
 	let selectedIcon = null;
 	let iconTimeout = null;
 
+	let activePreview = 'default';
+
+	function setPreview(preview) {
+		activePreview = preview;
+	}
+
 	$: previewIcon.subscribe((icon) => {
 		if (icon) {
 			selectedIcon = icon;
@@ -232,49 +238,56 @@
 		</div>
 
 		<div class="centeredContent">
-			<div class="mobilePreview">
-				{#if activeNotification}
-					<div transition:fly={{ y: -20, duration: 300 }} class="notification-banner">
-						<div class="notificationBox">
-							<div>
-								<img src="img/Account.png" alt="" />
-							</div>
-							<div class="notificationBoxContent">
-								<div class="titleNotificationBoxContent">{activeNotification.title}</div>
-								<div class="descNotificationBoxContent">{activeNotification.description}</div>
+			{#if activePreview === 'default'}
+				<div class="mobilePreview">
+					<!-- Contenuto originale -->
+					{#if activeNotification}
+						<div transition:fly={{ y: -20, duration: 300 }} class="notification-banner">
+							<div class="notificationBox">
+								<div>
+									<img src="img/Account.png" alt="" />
+								</div>
+								<div class="notificationBoxContent">
+									<div class="titleNotificationBoxContent">{activeNotification.title}</div>
+									<div class="descNotificationBoxContent">{activeNotification.description}</div>
+								</div>
 							</div>
 						</div>
-					</div>
-				{/if}
-				{#if selectedIcon}
-					<div class="flexPreviewBox">
-						<div
-							class={selectedIcon.animationType || ''}
-							style="animation-duration: {selectedIcon.animationSpeed || 2}s; 
-		       transform: scale({selectedIcon.scale || 1})">
-							{@html selectedIcon.svgContent.replace(
-								'<svg',
-								`
-		<svg fill="${selectedIcon.fill}" stroke="${selectedIcon.stroke}"
-		`
-							)}
-						</div>
-						{#if selectedIcon.desc}
+					{/if}
+					{#if selectedIcon}
+						<div class="flexPreviewBox">
 							<div
-								class="descpreview"
-								style="color: {selectedIcon.desc.color}; font-weight: {selectedIcon.desc.weight}">
-								{selectedIcon.desc.text}
+								class={selectedIcon.animationType || ''}
+								style="animation-duration: {selectedIcon.animationSpeed || 2}s;
+									   transform: scale({selectedIcon.scale || 1})">
+								{@html selectedIcon.svgContent.replace(
+									'<svg',
+									`
+									<svg fill="${selectedIcon.fill}" stroke="${selectedIcon.stroke}"
+									`
+								)}
 							</div>
-						{/if}
-					</div>
-				{/if}
-			</div>
+							{#if selectedIcon.desc}
+								<div
+									class="descpreview"
+									style="color: {selectedIcon.desc.color}; font-weight: {selectedIcon.desc.weight}">
+									{selectedIcon.desc.text}
+								</div>
+							{/if}
+						</div>
+					{/if}
+				</div>
+			{:else}
+				<img src="/img/{activePreview}.png" alt="Anteprima" class="preview-image" />
+			{/if}
 
-			<div class="pageNumberContainer">
-				<span class="fw_400">1/5</span>
-				<img alt="" src="/img/Vector.png" class="ml-10" />
-			</div>
 			<div class="footer">
+				<div>
+					<button class="btn-alt" on:click={() => setPreview('default')}>Default</button>
+					<button class="btn-alt" on:click={() => setPreview('PreviewImg1')}>Preview 1</button>
+					<button class="btn-alt" on:click={() => setPreview('PreviewImg2')}>Preview 2</button>
+					<button class="btn-alt" on:click={() => setPreview('PreviewImg3')}>Preview 3</button>
+				</div>
 				<div class="d-flex align-items-center">
 					<div class="zoom">
 						<input id="zoom_input" type="range" min="0" max="100" step="1" />
@@ -288,6 +301,13 @@
 </div>
 
 <style scoped>
+	.footer {
+		display: flex;
+		justify-content: space-between;
+	}
+	.btn-alt {
+		padding: 6px;
+	}
 	.leftShoulder {
 		z-index: 10;
 	}
@@ -484,5 +504,9 @@
 	.descpreview {
 		text-align: center;
 		margin-top: 16px;
+	}
+
+	.preview-image {
+		transform: scale(0.83);
 	}
 </style>

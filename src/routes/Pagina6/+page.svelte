@@ -215,6 +215,14 @@
 		border-radius: 6px;
 		cursor: pointer;
 	}
-	
-	
+
+	.button-group button {
+		background-color: white !important;
+		border: 1px solid #949494 !important;
+	}
+
+	.button-group button:hover {
+		background-color: #8213491a !important;
+		border: 1px solid #821349 !important;
+	}
 </style>

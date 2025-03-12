@@ -20,7 +20,7 @@
 	let savedIconsList = [];
 	let editingIndex = null; // Indice dell'icona che sta venendo rinominata
 	let newTitle = ''; // Nuovo titolo da modificare
-
+	let enableNotify = false;
 	// Sottoscrizione per ottenere la lista completa delle icone salvate
 	savedIcons.subscribe((icons) => {
 		savedIconsList = icons;
@@ -179,6 +179,14 @@
 
 	function openSoundModal() {
 		showSoundModal = true;
+	}
+
+	function enableNotification(index) {
+		let updatedNotifications = [...$notifications];
+
+		updatedNotifications[index].enabled = !updatedNotifications[index].enabled;
+
+		notifications.set(updatedNotifications);
 	}
 
 	function closeSoundModal() {
@@ -645,34 +653,40 @@
 				<div id="i_miei_feedback_notifiche" class="accordion-content">
 					{#each savedIconsList as icon, index}
 						<div class="saved-icon-item">
-							<div class="saved-icon-item-box">
-								<div
-									class={icon.animationType || ''}
-									style="animation-duration: {icon.animationSpeed || 2}s;">
-									{@html icon.svgContent.replace(
-										'<svg',
-										`
-									<svg
-										fill="${icon.fill}"
-										stroke="${icon.stroke}"
-									`
-									)}
-								</div>
-
-								<!-- Se l'icona è in modalità modifica, mostriamo un input -->
-								<div>
+							<div class="saved-icon-item-main">
+								<div class="saved-icon-item-box">
 									{#if editingIndex === index}
 										<input type="text" bind:value={newTitle} class="rename-input" />
 									{:else}
 										<p class="titleIconPrev">{icon.title}</p>
 									{/if}
-									{#if icon.desc}
-										<p
-											class="descIconPrev"
-											style="color: {icon.desc.color}; font-weight: {icon.desc.weight}">
-											{icon.desc.text}
-										</p>
-									{/if}
+									<div
+										class={icon.animationType || ''}
+										style="animation-duration: {icon.animationSpeed || 2}s;">
+										{@html icon.svgContent.replace(
+											'<svg',
+											`
+										<svg
+											fill="${icon.fill}"
+											stroke="${icon.stroke}"
+										`
+										)}
+									</div>
+
+									<!-- Se l'icona è in modalità modifica, mostriamo un input -->
+									<div>
+										{#if icon.desc}
+											<p
+												class="descIconPrev"
+												style="color: {icon.desc.color}; font-weight: {icon.desc.weight}">
+												{icon.desc.text}
+											</p>
+										{/if}
+									</div>
+								</div>
+								<div class="saved-icon-item-box-alt">
+									<button class="btn-alt">Aggiungi alla pagina</button>
+									<button class="btn-alt">Rimuovi dalla pagina</button>
 								</div>
 							</div>
 							<div class="saved-icon-item-action">
@@ -717,6 +731,13 @@
 							</div>
 
 							<div class="action-buttons">
+								<button class="buttonStyle" on:click={() => enableNotification(index)}>
+									{#if notification.enabled}
+										Disattiva notifica
+									{:else}
+										Attiva notifica
+									{/if}
+								</button>
 								<button class="buttonStyle" on:click={() => previewNotification(index)}>
 									Anteprima
 								</button>
@@ -872,7 +893,17 @@
 	}
 	.saved-icon-item-box {
 		display: flex;
+		flex-direction: column;
 		align-items: center;
+		width: 50%;
+		gap: 6px;
+	}
+
+	.saved-icon-item-box-alt {
+		display: flex;
+		flex-direction: column;
+		align-items: end;
+		width: 50%;
 		gap: 6px;
 	}
 
@@ -885,6 +916,11 @@
 
 	.saved-icon-item-action button {
 		padding: 6px;
+	}
+
+	.btn-alt {
+		padding: 6px;
+		width: 150px;
 	}
 	.backButton {
 		position: absolute;
@@ -1079,7 +1115,7 @@
 
 	.titleIconPrev {
 		font-weight: 600;
-		font-size: 14px;
+		font-size: 18px;
 		padding-bottom: 8px;
 	}
 
@@ -1162,5 +1198,9 @@
 
 	.linkStyle img {
 		width: 20px;
+	}
+
+	.saved-icon-item-main {
+		display: flex;
 	}
 </style>

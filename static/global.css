@@ -1093,7 +1093,7 @@ header {
            
 
             button:hover {
-                background-color: rgba(130, 19, 73, 0.1);
+                background-color: #8213491a;
                 border: 1px solid #9F1349;
             }
             .accordion-arrow {
